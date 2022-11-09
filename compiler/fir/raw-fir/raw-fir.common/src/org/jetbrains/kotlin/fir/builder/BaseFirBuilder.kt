@@ -30,8 +30,7 @@ import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildErrorTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
-import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
+import org.jetbrains.kotlin.fir.types.impl.*
 import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.parsing.*
@@ -850,6 +849,9 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
             if (classBuilder.classKind != ClassKind.OBJECT) {
                 generateComponentFunctions()
                 generateCopyFunction()
+                generateEqualsFunction()
+                generateHashCodeFunction()
+                generateToStringFunction()
             }
             // Refer to (IR utils or FIR backend) DataClassMembersGenerator for generating equals, hashCode, and toString
         }
@@ -872,6 +874,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     }
                     symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, name))
                     dispatchReceiverType = currentDispatchReceiverType()
+                    returnTypeRef = firProperty.returnTypeRef
                     // Refer to FIR backend ClassMemberGenerator for body generation.
                 }
                 classBuilder.addDeclaration(componentFunction)
@@ -889,6 +892,63 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     createParameterTypeRefWithSourceKind
                 ) { src, kind -> src?.toFirSourceElement(kind) }
             )
+        }
+
+        private fun generateEqualsFunction() {
+            classBuilder.addDeclaration(
+                buildSimpleFunction {
+                    generateSyntheticFunction(OperatorNameConventions.EQUALS, isOperator = true)
+                    returnTypeRef = FirImplicitBooleanTypeRef(source)
+                    this.valueParameters.add(
+                        buildValueParameter {
+                            this.name = Name.identifier("other")
+                            origin = FirDeclarationOrigin.Synthetic
+                            moduleData = baseModuleData
+                            this.returnTypeRef = FirImplicitNullableAnyTypeRef(null)
+                            this.symbol = FirValueParameterSymbol(this.name)
+                            containingFunctionSymbol = this@buildSimpleFunction.symbol
+                            isCrossinline = false
+                            isNoinline = false
+                            isVararg = false
+                        }
+                    )
+                }
+            )
+        }
+
+        private fun generateHashCodeFunction() {
+            classBuilder.addDeclaration(
+                buildSimpleFunction {
+                    generateSyntheticFunction(OperatorNameConventions.HASH_CODE)
+                    returnTypeRef = FirImplicitIntTypeRef(source)
+                }
+            )
+        }
+
+        private fun generateToStringFunction() {
+            classBuilder.addDeclaration(
+                buildSimpleFunction {
+                    generateSyntheticFunction(OperatorNameConventions.TO_STRING)
+                    returnTypeRef = FirImplicitStringTypeRef(source)
+                }
+            )
+        }
+
+        private fun FirSimpleFunctionBuilder.generateSyntheticFunction(
+            name: Name,
+            source: KtSourceElement? =
+                this@DataClassMembersGenerator.source.toFirSourceElement(KtFakeSourceElementKind.DataClassGeneratedMembers),
+            isOperator: Boolean = false,
+        ) {
+            this.source = source
+            moduleData = baseModuleData
+            origin = FirDeclarationOrigin.Synthetic
+            this.name = name
+            status = FirDeclarationStatusImpl(Visibilities.Public, Modality.FINAL).apply {
+                this.isOperator = isOperator
+            }
+            symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, name))
+            dispatchReceiverType = currentDispatchReceiverType()
         }
     }
 
