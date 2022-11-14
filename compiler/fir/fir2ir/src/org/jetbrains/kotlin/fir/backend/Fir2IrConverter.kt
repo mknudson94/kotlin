@@ -38,6 +38,7 @@ import org.jetbrains.kotlin.ir.util.NaiveSourceBasedFileEntryImpl
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import org.jetbrains.kotlin.platform.isJs
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
 class Fir2IrConverter(
     private val moduleDescriptor: FirModuleDescriptor,
@@ -180,6 +181,11 @@ class Fir2IrConverter(
     private fun processFileAndClassMembers(file: FirFile) {
         val irFile = declarationStorage.getIrFile(file)
         for (declaration in file.declarations) {
+            if (declaration is FirSimpleFunction && declaration.origin == FirDeclarationOrigin.Synthetic) {
+                if (declaration.name in listOf(OperatorNameConventions.EQUALS, OperatorNameConventions.HASH_CODE, OperatorNameConventions.TO_STRING)) {
+                    continue
+                }
+            }
             val irDeclaration = processMemberDeclaration(declaration, null, irFile) ?: continue
             irFile.declarations += irDeclaration
         }
@@ -369,6 +375,11 @@ class Fir2IrConverter(
                 }
             }
             is FirSimpleFunction -> {
+                if (declaration.origin == FirDeclarationOrigin.Synthetic) {
+                    if (declaration.name in listOf(OperatorNameConventions.EQUALS, OperatorNameConventions.HASH_CODE, OperatorNameConventions.TO_STRING)) {
+                        return null
+                    }
+                }
                 declarationStorage.getOrCreateIrFunction(
                     declaration, parent, isLocal = isLocal
                 )
