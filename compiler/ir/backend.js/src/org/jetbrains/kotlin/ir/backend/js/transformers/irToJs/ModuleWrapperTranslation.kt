@@ -133,7 +133,7 @@ object ModuleWrapperTranslation {
 
         val importStatements = importedModules.zip(function.parameters.drop(1)).map {
             JsImport(
-                it.first.getRequireName(true),
+                it.first.getRequireName(isEsm = true),
                 if (it.first.plainReference == null) {
                     JsImport.Target.All(alias = it.second.name.makeRef())
                 } else {
