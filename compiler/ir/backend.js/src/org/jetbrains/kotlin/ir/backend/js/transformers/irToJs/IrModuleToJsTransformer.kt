@@ -293,7 +293,7 @@ class IrModuleToJsTransformer(
     private val optimizeGeneratedJs = backendContext.configuration.get(JSConfigurationKeys.OPTIMIZE_GENERATED_JS, true)
 
     private fun generateProgramFragment(fileExports: IrFileExports, minimizedMemberNames: Boolean): JsIrProgramFragment {
-        val nameGenerator = JsNameLinkingNamer(backendContext, minimizedMemberNames)
+        val nameGenerator = JsNameLinkingNamer(backendContext, minimizedMemberNames, isEsModules)
 
         val globalNameScope = NameTable<IrDeclaration>()
 
