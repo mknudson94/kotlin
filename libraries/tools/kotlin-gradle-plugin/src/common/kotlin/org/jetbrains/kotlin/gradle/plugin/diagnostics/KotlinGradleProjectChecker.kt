@@ -8,10 +8,7 @@ package org.jetbrains.kotlin.gradle.plugin.diagnostics
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider
-import org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers.CommonMainWithDependsOnChecker
-import org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers.DeprecatedKotlinNativeTargetsChecker
-import org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers.MissingNativeStdlibChecker
-import org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers.UnusedSourceSetsChecker
+import org.jetbrains.kotlin.gradle.plugin.diagnostics.checkers.*
 
 /**
  * Interface for generic checks of a Gradle Project with Kotlin Plugin applied
@@ -32,6 +29,7 @@ internal fun interface KotlinGradleProjectChecker {
             DeprecatedKotlinNativeTargetsChecker,
             MissingNativeStdlibChecker,
             UnusedSourceSetsChecker,
+            TargetsWithAmbiguousConsumableConfigurationsChecker
         )
     }
 }

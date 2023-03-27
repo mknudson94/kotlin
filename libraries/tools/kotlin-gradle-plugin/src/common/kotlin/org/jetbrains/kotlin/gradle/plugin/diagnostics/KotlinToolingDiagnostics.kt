@@ -161,4 +161,15 @@ object KotlinToolingDiagnostics {
     object FailedToGetAgpVersionWarning : ToolingDiagnosticFactory(WARNING) {
         operator fun invoke() = build("Failed to get AndroidGradlePluginVersion")
     }
+
+    object TargetsNeedDisambiguation : ToolingDiagnosticFactory(WARNING) {
+        operator fun invoke(targetGroupsRendered: String) = build(
+            """
+            |The following targets are not distinguishable:
+            |$targetGroupsRendered
+            |Use an additional attribute to disambiguate them 
+            |See https://kotlinlang.org/docs/multiplatform-set-up-targets.html#distinguish-several-targets-for-one-platform for more details
+            """.trimMargin()
+        )
+    }
 }
