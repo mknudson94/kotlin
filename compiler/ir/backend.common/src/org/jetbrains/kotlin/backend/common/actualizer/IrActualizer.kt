@@ -31,15 +31,17 @@ object IrActualizer {
 
         val removedExpectDeclarations = removeExpectDeclarations(dependentFragments, expectActualMap)
 
-        val symbolRemapper = ActualizerSymbolRemapper(expectActualMap)
-        val typeRemapper = DeepCopyTypeRemapper(symbolRemapper)
-        FunctionDefaultParametersActualizer(symbolRemapper, typeRemapper, expectActualMap).actualize()
+        FakeOverridesActualizer(expectActualMap).apply { dependentFragments.forEach { visitModuleFragment(it) } }
 
-        MissingFakeOverridesAdder(
+        ActualFakeOverridesAdder(
             expectActualMap,
             expectActualTypeAliasMap,
             ktDiagnosticReporter
         ).apply { dependentFragments.forEach { visitModuleFragment(it) } }
+
+        val symbolRemapper = ActualizerSymbolRemapper(expectActualMap)
+        val typeRemapper = DeepCopyTypeRemapper(symbolRemapper)
+        FunctionDefaultParametersActualizer(symbolRemapper, typeRemapper, expectActualMap).actualize()
 
         val actualizerVisitor = ActualizerVisitor(symbolRemapper, typeRemapper)
         dependentFragments.forEach { it.transform(actualizerVisitor, null) }

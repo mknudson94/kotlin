@@ -22003,6 +22003,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             }
 
             @Test
+            @TestMetadata("kt58153.kt")
+            public void testKt58153() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/multiplatform/kt58153.kt");
+            }
+
+            @Test
             @TestMetadata("manyInterfacesMemberNotImplemented.kt")
             public void testManyInterfacesMemberNotImplemented() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/multiplatform/manyInterfacesMemberNotImplemented.kt");
@@ -22012,6 +22018,12 @@ public class DiagnosticTestGenerated extends AbstractDiagnosticTest {
             @TestMetadata("modifierApplicability.kt")
             public void testModifierApplicability() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/multiplatform/modifierApplicability.kt");
+            }
+
+            @Test
+            @TestMetadata("multipleExpectInterfacesImplementation.kt")
+            public void testMultipleExpectInterfacesImplementation() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/multiplatform/multipleExpectInterfacesImplementation.kt");
             }
 
             @Test

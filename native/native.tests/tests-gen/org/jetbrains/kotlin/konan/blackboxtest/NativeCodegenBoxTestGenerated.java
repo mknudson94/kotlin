@@ -26765,6 +26765,36 @@ public class NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTest 
                     }
 
                     @Test
+                    @TestMetadata("expectActualFakeOverrides2.kt")
+                    public void testExpectActualFakeOverrides2() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualFakeOverrides2.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("expectActualFakeOverrides3.kt")
+                    public void testExpectActualFakeOverrides3() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualFakeOverrides3.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("expectActualFakeOverridesWithTypeParameters.kt")
+                    public void testExpectActualFakeOverridesWithTypeParameters() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualFakeOverridesWithTypeParameters.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("expectActualIntersectionOverride.kt")
+                    public void testExpectActualIntersectionOverride() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualIntersectionOverride.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("expectActualIntersectionOverride2.kt")
+                    public void testExpectActualIntersectionOverride2() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualIntersectionOverride2.kt");
+                    }
+
+                    @Test
                     @TestMetadata("expectActualMultiCommon.kt")
                     public void testExpectActualMultiCommon() throws Exception {
                         runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualMultiCommon.kt");
@@ -26804,6 +26834,12 @@ public class NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTest 
                     @TestMetadata("expectInterfaceInSupertypes.kt")
                     public void testExpectInterfaceInSupertypes() throws Exception {
                         runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectInterfaceInSupertypes.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("expectInterfaceInSupertypes2.kt")
+                    public void testExpectInterfaceInSupertypes2() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectInterfaceInSupertypes2.kt");
                     }
 
                     @Test

@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.classifierOrFail
+import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -21,7 +22,7 @@ internal class ExpectActualCollector(
     private val dependentFragments: List<IrModuleFragment>,
     private val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
 ) {
-    fun collect(): Pair<Map<IrSymbol, IrSymbol>, Map<FqName, FqName>> {
+    fun collect(): Pair<MutableMap<IrSymbol, IrSymbol>, Map<FqName, FqName>> {
         val result = mutableMapOf<IrSymbol, IrSymbol>()
         // Collect and link classes at first to make it possible to expand type aliases on the members linking
         val (actualMembers, expectActualTypeAliasMap) = result.appendExpectActualClassMap()
@@ -157,31 +158,27 @@ private class MemberLinksCollector(
         if ((declaration.parent as IrClass).isExpect) addLink(declaration)
     }
 
-    private fun addLink(declaration: IrDeclarationBase) {
-        val actualMemberMatches = actualMembers.getMatches(declaration, expectActualMap, typeAliasMap)
+    private fun addLink(expectDeclaration: IrDeclarationBase) {
+        val actualMemberMatches = actualMembers.getMatches(expectDeclaration, expectActualMap, typeAliasMap)
         when {
             actualMemberMatches.size == 1 -> {
-                val actualMember = actualMemberMatches.single()
-                expectActualMap[declaration.symbol] = actualMember.symbol
-                if (declaration is IrProperty) {
-                    val actualProperty = actualMember as IrProperty
-                    declaration.getter?.let {
-                        val getter = actualProperty.getter!!
-                        expectActualMap[it.symbol] = getter.symbol
-                        expectActualMap.appendTypeParametersMap(it, getter)
-                    }
-                    declaration.setter?.symbol?.let { expectActualMap[it] = actualProperty.setter!!.symbol }
-                } else if (declaration is IrFunction) {
-                    expectActualMap.appendTypeParametersMap(declaration, actualMember as IrFunction)
-                }
+                expectActualMap.addLink(expectDeclaration, actualMemberMatches.single())
             }
             actualMemberMatches.size > 1 -> {
                 // TODO: report AMBIGUOUS_ACTUALS here, see KT-57932
             }
-            !declaration.parent.containsOptionalExpectation() && !(declaration is IrConstructor && declaration.isPrimary) -> {
-                diagnosticsReporter.reportMissingActual(declaration)
+            (expectDeclaration.parent as? IrClass)?.isExpect == false && expectDeclaration.isFakeOverride -> {
+                // Remaining expect fake override members from not expect classes will be actualized in FakeOverridesTransformer
+                // It occurs in a separated step because they require filled expectActualMap for members from expect classes
+            }
+            shouldReportMissingActual(expectDeclaration) -> {
+                diagnosticsReporter.reportMissingActual(expectDeclaration)
             }
         }
+    }
+
+    private fun shouldReportMissingActual(declaration: IrDeclarationBase): Boolean {
+        return !declaration.parent.containsOptionalExpectation() && !(declaration is IrConstructor && declaration.isPrimary)
     }
 
     override fun visitElement(element: IrElement) {
@@ -189,7 +186,7 @@ private class MemberLinksCollector(
     }
 }
 
-private fun MutableMap<IrSymbol, IrSymbol>.appendTypeParametersMap(
+fun MutableMap<IrSymbol, IrSymbol>.appendTypeParametersMap(
     expectTypeParametersContainer: IrTypeParametersContainer,
     actualTypeParametersContainer: IrTypeParametersContainer
 ) {
