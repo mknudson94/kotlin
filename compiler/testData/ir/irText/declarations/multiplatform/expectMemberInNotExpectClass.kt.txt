@@ -1,0 +1,18 @@
+// FILE: platform.kt
+
+open class C1 {
+  constructor() /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+  fun f(): String {
+    return "O"
+  }
+
+  val p: Int
+    field = 42
+    get
+
+}

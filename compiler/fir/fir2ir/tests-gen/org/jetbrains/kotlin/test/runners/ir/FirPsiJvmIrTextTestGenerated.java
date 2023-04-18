@@ -1010,6 +1010,12 @@ public class FirPsiJvmIrTextTestGenerated extends AbstractFirPsiJvmIrTextTest {
             }
 
             @Test
+            @TestMetadata("expectMemberInNotExpectClass.kt")
+            public void testExpectMemberInNotExpectClass() throws Exception {
+                runTest("compiler/testData/ir/irText/declarations/multiplatform/expectMemberInNotExpectClass.kt");
+            }
+
+            @Test
             @TestMetadata("expectedEnumClass.kt")
             public void testExpectedEnumClass() throws Exception {
                 runTest("compiler/testData/ir/irText/declarations/multiplatform/expectedEnumClass.kt");
