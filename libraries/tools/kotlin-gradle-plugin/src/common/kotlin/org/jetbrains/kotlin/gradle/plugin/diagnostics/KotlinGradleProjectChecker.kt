@@ -30,7 +30,8 @@ internal fun interface KotlinGradleProjectChecker {
             MissingNativeStdlibChecker,
             UnusedSourceSetsChecker,
             TargetsWithAmbiguousConsumableConfigurationsChecker,
-            AndroidPluginWithoutAndroidTargetChecker
+            AndroidPluginWithoutAndroidTargetChecker,
+            NoKotlinTargetsDeclaredChecker
         )
     }
 }
