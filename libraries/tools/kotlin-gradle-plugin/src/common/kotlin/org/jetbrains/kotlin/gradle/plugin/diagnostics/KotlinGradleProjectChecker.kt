@@ -31,7 +31,8 @@ internal fun interface KotlinGradleProjectChecker {
             UnusedSourceSetsChecker,
             TargetsWithAmbiguousConsumableConfigurationsChecker,
             AndroidPluginWithoutAndroidTargetChecker,
-            NoKotlinTargetsDeclaredChecker
+            NoKotlinTargetsDeclaredChecker,
+            DisabledCinteropCommonizationInHmppProjectChecker
         )
     }
 }
