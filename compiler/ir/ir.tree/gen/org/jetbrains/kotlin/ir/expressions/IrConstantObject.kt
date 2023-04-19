@@ -24,7 +24,7 @@ abstract class IrConstantObject : IrConstantValue() {
 
     abstract val valueArguments: MutableList<IrConstantValue>
 
-    abstract val typeArguments: List<IrType>
+    abstract var typeArguments: List<IrType>
 
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R =
         visitor.visitConstantObject(this, data)

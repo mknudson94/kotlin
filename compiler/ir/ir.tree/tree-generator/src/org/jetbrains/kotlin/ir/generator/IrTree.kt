@@ -880,7 +880,7 @@ object IrTree : AbstractTreeBuilder() {
 
         +field("constructor", constructorSymbolType)
         +listField("valueArguments", constantValue, mutability = List, isChild = true)
-        +listField("typeArguments", irTypeType)
+        +listField("typeArguments", irTypeType, mutability = Var)
     }
     val constantArray: ElementConfig by element(Expression) {
         visitorParent = constantValue

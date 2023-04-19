@@ -39,7 +39,7 @@ class IrConstantObjectImpl constructor(
     override val endOffset: Int,
     override var constructor: IrConstructorSymbol,
     initArguments: List<IrConstantValue>,
-    override val typeArguments: List<IrType>,
+    override var typeArguments: List<IrType>,
     override var type: IrType = constructor.owner.constructedClassType,
 ) : IrConstantObject() {
     override val valueArguments = SmartList(initArguments)
