@@ -9,6 +9,8 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.kotlinToolingDiagnosticsCollector
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.ToolingDiagnostic
+import org.jetbrains.kotlin.gradle.plugin.diagnostics.ToolingDiagnosticFactory
+import org.junit.jupiter.api.Assertions.assertEquals
 import java.io.File
 import java.nio.file.Path
 import kotlin.test.assertTrue
@@ -63,6 +65,16 @@ internal fun Project.assertNoDiagnostics() {
     val actualDiagnostics = kotlinToolingDiagnosticsCollector.getDiagnosticsForProject(this)
     assertTrue(
         actualDiagnostics.isEmpty(), "Expected to have no diagnostics, but some were reported:\n ${actualDiagnostics.render()}"
+    )
+}
+
+internal fun Project.assertHasDiagnostic(factory: ToolingDiagnosticFactory, count: Int = 1) {
+    val diagnostics = kotlinToolingDiagnosticsCollector.getDiagnosticsForProject(this).filter { it.id == factory.id }
+    assertEquals(
+        diagnostics.size,
+        count,
+        "Expected exactly $count diagnostic(s) with id ${factory.id} reported, but got ${diagnostics.size}" +
+                if (diagnostics.isNotEmpty()) "\n\n" + diagnostics.joinToString(separator = "\n\n") { it.toString() } else ""
     )
 }
 
