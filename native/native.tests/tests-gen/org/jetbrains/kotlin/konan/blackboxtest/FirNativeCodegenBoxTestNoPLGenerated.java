@@ -24661,6 +24661,12 @@ public class FirNativeCodegenBoxTestNoPLGenerated extends AbstractNativeCodegenB
                 public void testAnnotationWithDefaults() throws Exception {
                     runTest("compiler/testData/codegen/box/involvesIrInterpreter/serialization/annotationWithDefaults.kt");
                 }
+
+                @Test
+                @TestMetadata("typeAnnotation.kt")
+                public void testTypeAnnotation() throws Exception {
+                    runTest("compiler/testData/codegen/box/involvesIrInterpreter/serialization/typeAnnotation.kt");
+                }
             }
         }
 
