@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.gradle.logging.kotlinDebug
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.PropertyNames.KOTLIN_SUPPRESS_EXPERIMENTAL_IC_OPTIMIZATIONS_WARNING
 import org.jetbrains.kotlin.gradle.plugin.UsesBuildFinishedListenerService
 import org.jetbrains.kotlin.gradle.plugin.UsesVariantImplementationFactories
+import org.jetbrains.kotlin.gradle.plugin.diagnostics.UsesKotlinToolingDiagnostics
 import org.jetbrains.kotlin.gradle.plugin.statistics.KotlinBuildStatsService
 import org.jetbrains.kotlin.gradle.report.*
 import org.jetbrains.kotlin.gradle.utils.*
@@ -61,6 +62,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments> @Inject constr
     UsesVariantImplementationFactories,
     UsesBuildFinishedListenerService,
     UsesClassLoadersCachingBuildService,
+    UsesKotlinToolingDiagnostics,
     BaseKotlinCompile {
 
     init {
