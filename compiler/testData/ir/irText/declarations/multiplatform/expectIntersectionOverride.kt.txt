@@ -1,0 +1,19 @@
+// FILE: platform.kt
+
+class C : I1, I2 {
+  constructor() /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+  override fun f(): String {
+    return "OK"
+  }
+
+  override val p: Int
+    field = 42
+    override get
+
+}
+
