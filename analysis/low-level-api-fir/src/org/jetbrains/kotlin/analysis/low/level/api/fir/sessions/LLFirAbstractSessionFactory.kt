@@ -116,7 +116,6 @@ internal abstract class LLFirAbstractSessionFactory(protected val project: Proje
 
             register(FirPredicateBasedProvider::class, FirEmptyPredicateBasedProvider)
             register(DEPENDENCIES_SYMBOL_PROVIDER_QUALIFIED_KEY, dependencyProvider)
-            register(FirJvmTypeMapper::class, FirJvmTypeMapper(this))
             register(FirRegisteredPluginAnnotations::class, FirRegisteredPluginAnnotations.Empty)
 
             LLFirSessionConfigurator.configure(this)
