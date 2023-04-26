@@ -34,7 +34,8 @@ internal fun interface KotlinGradleProjectChecker {
             NoKotlinTargetsDeclaredChecker,
             DisabledCinteropCommonizationInHmppProjectChecker,
             DisabledNativeTargetsChecker,
-            JsEnvironmentChecker
+            JsEnvironmentChecker,
+            PreHmppDependenciesUsageChecker
         )
     }
 }
