@@ -6,12 +6,15 @@
 package org.jetbrains.kotlin.ir.interpreter.checker
 
 import org.jetbrains.kotlin.constant.EvaluatedConstTracker
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.IrErrorExpression
 import org.jetbrains.kotlin.ir.interpreter.IrInterpreter
+import org.jetbrains.kotlin.ir.util.primaryConstructor
 
 internal class IrConstDeclarationAnnotationTransformer(
     interpreter: IrInterpreter,
@@ -24,6 +27,14 @@ internal class IrConstDeclarationAnnotationTransformer(
 ) : IrConstAnnotationTransformer(interpreter, irFile, mode, evaluatedConstTracker, onWarning, onError, suppressExceptions) {
     override fun visitDeclaration(declaration: IrDeclarationBase, data: Nothing?): IrStatement {
         transformAnnotations(declaration)
+        if (declaration is IrClass && declaration.kind == ClassKind.ANNOTATION_CLASS) {
+            declaration.primaryConstructor?.valueParameters?.forEach {
+                val defaultExpression = it.defaultValue?.expression ?: return@forEach
+                if (defaultExpression.canBeInterpreted()) {
+                    it.defaultValue?.expression = defaultExpression.interpret(failAsError = false)
+                }
+            }
+        }
         return super.visitDeclaration(declaration, data)
     }
 }
