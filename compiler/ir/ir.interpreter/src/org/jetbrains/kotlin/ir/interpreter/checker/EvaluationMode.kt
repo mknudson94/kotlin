@@ -24,6 +24,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean = true
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
+        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = true
     },
 
     WITH_ANNOTATIONS(mustCheckBody = false) {
@@ -47,6 +48,9 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
+        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean {
+            return (reference.symbol.owner as IrClass).isMarkedAsCompileTime()
+        }
     },
 
     ONLY_BUILTINS(mustCheckBody = false) {
@@ -91,11 +95,14 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = false
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = false
+        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
     },
 
     ONLY_INTRINSIC_CONST(mustCheckBody = false) {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean {
-            return function.isCompileTimePropertyAccessor() || function.isMarkedAsIntrinsicConstEvaluation() || context.isIntrinsicConstEvaluationNameProperty()
+            return function.isCompileTimePropertyAccessor() ||
+                    function.isMarkedAsIntrinsicConstEvaluation() ||
+                    (function !is IrConstructor && context.isIntrinsicConstEvaluationNameProperty())
         }
 
         private fun IrFunction?.isCompileTimePropertyAccessor(): Boolean {
@@ -111,6 +118,8 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
             return context.isIntrinsicConstEvaluationNameProperty()
         }
 
+        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
+
         private fun IrCall?.isIntrinsicConstEvaluationNameProperty(): Boolean {
             if (this == null) return false
             val owner = this.symbol.owner
@@ -122,6 +131,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
     abstract fun canEvaluateFunction(function: IrFunction, context: IrCall? = null): Boolean
     abstract fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall? = null): Boolean
     abstract fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall? = null): Boolean
+    abstract fun canEvaluateReference(reference: IrDeclarationReference): Boolean
 
     fun mustCheckBodyOf(function: IrFunction): Boolean {
         if (function.property != null) return true
@@ -132,7 +142,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         "java.lang.StringBuilder", "java.lang.IllegalArgumentException", "java.util.NoSuchElementException"
     )
 
-    fun IrDeclaration.isMarkedAsCompileTime() = isMarkedWith(compileTimeAnnotation)
+    protected fun IrDeclaration.isMarkedAsCompileTime() = isMarkedWith(compileTimeAnnotation)
     protected fun IrDeclaration.isMarkedAsIntrinsicConstEvaluation() = isMarkedWith(intrinsicConstEvaluationAnnotation)
     private fun IrDeclaration.isContract() = isMarkedWith(contractsDslAnnotation)
     private fun IrDeclaration.isMarkedAsEvaluateIntrinsic() = isMarkedWith(evaluateIntrinsicAnnotation)

@@ -20,20 +20,20 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
 class IrCompileTimeChecker(
     containingDeclaration: IrElement? = null,
-    private val mode: EvaluationMode = EvaluationMode.WITH_ANNOTATIONS,
+    private val mode: EvaluationMode,
     private val interpreterConfiguration: IrInterpreterConfiguration,
 ) : IrElementVisitor<Boolean, Nothing?> {
     private var contextExpression: IrCall? = null
     private val visitedStack = mutableListOf<IrElement>().apply { if (containingDeclaration != null) add(containingDeclaration) }
 
-    private fun IrElement.asVisited(block: () -> Boolean): Boolean {
+    private inline fun IrElement.asVisited(crossinline block: () -> Boolean): Boolean {
         visitedStack += this
         val result = block()
         visitedStack.removeAt(visitedStack.lastIndex)
         return result
     }
 
-    private fun <R> IrCall.saveContext(block: () -> R): R {
+    private inline fun <R> IrCall.saveContext(crossinline block: () -> R): R {
         val oldContext = contextExpression
         contextExpression = this
         return block().apply { contextExpression = oldContext }
@@ -45,9 +45,12 @@ class IrCompileTimeChecker(
         return (this as? IrDeclarationContainer)?.declarations ?: (this as? IrStatementContainer)?.statements ?: emptyList()
     }
 
-    private fun visitStatements(statements: List<IrStatement>): Boolean {
-        when (mode) {
-            EvaluationMode.ONLY_BUILTINS, EvaluationMode.ONLY_INTRINSIC_CONST -> {
+    private fun visitStatements(container: IrElement, statements: List<IrStatement>): Boolean {
+        when {
+            mode == EvaluationMode.ONLY_INTRINSIC_CONST && container is IrBlock && container.origin == IrStatementOrigin.WHEN -> {
+                return statements.all { it.accept(this, null) }
+            }
+            mode == EvaluationMode.ONLY_BUILTINS || mode == EvaluationMode.ONLY_INTRINSIC_CONST -> {
                 val statement = statements.singleOrNull() ?: return false
                 return statement.accept(this, null)
             }
@@ -56,10 +59,9 @@ class IrCompileTimeChecker(
     }
 
     private fun visitConstructor(expression: IrFunctionAccessExpression): Boolean {
-        return when {
-            !visitValueArguments(expression, null) || !mode.canEvaluateFunction(expression.symbol.owner, contextExpression) -> false
-            else -> expression.symbol.owner.visitBodyIfNeeded()
-        }
+        if (!mode.canEvaluateFunction(expression.symbol.owner, contextExpression)) return false
+        if (!visitValueArguments(expression, null)) return false
+        return expression.symbol.owner.visitBodyIfNeeded()
     }
 
     private fun IrFunction.visitBodyIfNeeded(): Boolean {
@@ -105,7 +107,7 @@ class IrCompileTimeChecker(
     }
 
     override fun visitBody(body: IrBody, data: Nothing?): Boolean {
-        return visitStatements(body.statements)
+        return visitStatements(body, body.statements)
     }
 
     // We need this separate method to explicitly indicate that IrExpressionBody can be interpreted in any evaluation mode
@@ -114,17 +116,13 @@ class IrCompileTimeChecker(
     }
 
     override fun visitBlock(expression: IrBlock, data: Nothing?): Boolean {
-        if (mode == EvaluationMode.ONLY_INTRINSIC_CONST && expression.origin == IrStatementOrigin.WHEN) {
-            return expression.statements.all { it.accept(this, null) }
-        }
-
         // `IrReturnableBlock` will be created from IrCall after inline. We should do basically the same check as for IrCall.
         if (expression is IrReturnableBlock) {
-            // TODO after JVM inline MR 8122 will be pushed check original IrCall.
-            TODO("Interpretation of `IrReturnableBlock` is not implemented")
+            val inlinedBlock = expression.statements.singleOrNull() as? IrInlinedFunctionBlock
+            if (inlinedBlock != null) return inlinedBlock.inlineCall.accept(this, data)
         }
 
-        return visitStatements(expression.statements)
+        return visitStatements(expression, expression.statements)
     }
 
     override fun visitSyntheticBody(body: IrSyntheticBody, data: Nothing?): Boolean {
@@ -149,7 +147,7 @@ class IrCompileTimeChecker(
 
     override fun visitComposite(expression: IrComposite, data: Nothing?): Boolean {
         if (expression.origin == IrStatementOrigin.DESTRUCTURING_DECLARATION || expression.origin == null) {
-            return visitStatements(expression.statements)
+            return visitStatements(expression, expression.statements)
         }
         return false
     }
@@ -162,7 +160,7 @@ class IrCompileTimeChecker(
                         .filterIsInstance<IrSimpleFunction>()
                         .single { it.name.asString() == "toString" && it.valueParameters.isEmpty() && it.extensionReceiverParameter == null }
 
-                    mode.canEvaluateFunction(toString, null) && toString.visitBodyIfNeeded()
+                    mode.canEvaluateFunction(toString) && toString.visitBodyIfNeeded()
                 }
 
                 else -> arg.accept(this, data)
@@ -197,7 +195,7 @@ class IrCompileTimeChecker(
         val property = owner.correspondingPropertySymbol?.owner
         val fqName = owner.fqName
         fun isJavaStaticWithPrimitiveOrString(): Boolean {
-            return owner.origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB && owner.isStatic &&
+            return owner.origin == IrDeclarationOrigin.IR_EXTERNAL_JAVA_DECLARATION_STUB && owner.isStatic && owner.isFinal &&
                     (owner.type.isPrimitiveType() || owner.type.isStringClassType())
         }
         return when {
@@ -341,12 +339,6 @@ class IrCompileTimeChecker(
     }
 
     override fun visitClassReference(expression: IrClassReference, data: Nothing?): Boolean {
-        return with(mode) {
-            when (this) {
-                EvaluationMode.FULL -> true
-                EvaluationMode.WITH_ANNOTATIONS -> (expression.symbol.owner as IrClass).isMarkedAsCompileTime()
-                EvaluationMode.ONLY_BUILTINS, EvaluationMode.ONLY_INTRINSIC_CONST -> false
-            }
-        }
+        return mode.canEvaluateReference(expression)
     }
 }
