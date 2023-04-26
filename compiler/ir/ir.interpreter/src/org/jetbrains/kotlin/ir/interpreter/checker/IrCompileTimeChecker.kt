@@ -245,7 +245,6 @@ class IrCompileTimeChecker(
         val classProperties = irClass.declarations.filterIsInstance<IrProperty>()
         val anonymousInitializer = irClass.declarations.filterIsInstance<IrAnonymousInitializer>().filter { !it.isStatic }
 
-
         return anonymousInitializer.all { init -> init.body.accept(this, data) } && classProperties.all {
             val propertyInitializer = it.backingField?.initializer?.expression
             if ((propertyInitializer as? IrGetValue)?.origin == IrStatementOrigin.INITIALIZE_PROPERTY_FROM_PARAMETER) return@all true
