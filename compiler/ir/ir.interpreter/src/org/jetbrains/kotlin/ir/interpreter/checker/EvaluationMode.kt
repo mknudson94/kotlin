@@ -102,7 +102,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean {
             return function.isCompileTimePropertyAccessor() ||
                     function.isMarkedAsIntrinsicConstEvaluation() ||
-                    (function !is IrConstructor && context.isIntrinsicConstEvaluationNameProperty())
+                    context.isIntrinsicConstEvaluationNameProperty()
         }
 
         private fun IrFunction?.isCompileTimePropertyAccessor(): Boolean {
