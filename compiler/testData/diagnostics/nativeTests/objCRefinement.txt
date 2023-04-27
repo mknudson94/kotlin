@@ -5,6 +5,7 @@ package
 @kotlin.native.HiddenFromObjC @plugin.PluginHiddenFromObjC public fun multipleObjCRefinementsFunction(): kotlin.Unit
 @kotlin.native.ShouldRefineInSwift @plugin.PluginShouldRefineInSwift public fun multipleSwiftRefinementsFunction(): kotlin.Unit
 @plugin.PluginHiddenFromObjC @plugin.PluginShouldRefineInSwift public fun pluginRefinedFunction(): kotlin.Unit
+public fun produceInstanceOfHidden(): OuterHidden.Nested.Nested
 
 public open class Base {
     public constructor Base()
@@ -104,6 +105,13 @@ public interface InterfaceB {
     public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
     @HFOC /* = kotlin.native.HiddenFromObjC */ public abstract fun fooA(): kotlin.Unit
     @kotlin.native.HiddenFromObjC public abstract fun fooB(): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+internal final class InternalInheritsFromNested : OuterHidden.Nested.Nested {
+    public constructor InternalInheritsFromNested()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
     public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
     public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
 }
@@ -217,6 +225,13 @@ public interface NotHiddenInterface {
             public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
         }
     }
+}
+
+private final class PrivateInheritsFromNested : OuterHidden.Nested.Nested {
+    public constructor PrivateInheritsFromNested()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
 }
 public typealias HFOC = kotlin.native.HiddenFromObjC
 

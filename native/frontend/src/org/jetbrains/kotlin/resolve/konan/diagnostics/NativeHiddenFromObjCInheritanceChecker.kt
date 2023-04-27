@@ -24,9 +24,9 @@ object NativeHiddenFromObjCInheritanceChecker : DeclarationChecker {
         if (descriptor !is ClassDescriptor) return
         // Enum entries inherit from their enum class.
         if (descriptor.kind == ClassKind.ENUM_ENTRY) return
-        // Private and local classes does not leak to Objective-C API surface, so it is OK for them
+        // Non-public types do not leak to Objective-C API surface, so it is OK for them
         // to inherit from hidden types.
-        if (DescriptorVisibilities.isPrivate(descriptor.visibility)) return
+        if (!descriptor.visibility.isPublicAPI) return
         // No need to report anything on class that is hidden itself.
         if (checkClassIsHiddenFromObjC(descriptor)) return
         val superClass = descriptor.getSuperClassNotAny()

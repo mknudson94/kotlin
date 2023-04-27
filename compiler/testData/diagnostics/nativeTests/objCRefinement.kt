@@ -159,6 +159,14 @@ class OuterHidden {
 
 class InheritsFromNested : <!INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS!>OuterHidden.Nested.Nested<!>()
 
+private class PrivateInheritsFromNested : OuterHidden.Nested.Nested()
+
+internal class InternalInheritsFromNested : OuterHidden.Nested.Nested()
+
+fun produceInstanceOfHidden(): OuterHidden.Nested.Nested {
+    return object : OuterHidden.Nested.Nested() {}
+}
+
 @HiddenFromObjC
 enum class MyHiddenEnum {
     A,

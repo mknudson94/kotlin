@@ -17,15 +17,25 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors
 import org.jetbrains.kotlin.fir.declarations.FirRegularClass
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassLikeSymbol
 import org.jetbrains.kotlin.fir.declarations.utils.superConeTypes
+import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.types.*
 
+/**
+ * Check that the given class does not inherit from class or implements interface that is
+ * marked as HiddenFromObjC (aka "marked with annotation that is marked as HidesFromObjC").
+ */
 object FirNativeHiddenFromObjCInheritanceChecker : FirRegularClassChecker() {
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
+        // Enum entries inherit from their enum class.
         if (declaration.classKind == ClassKind.ENUM_ENTRY) {
             return
         }
+        // Non-public types do not leak to Objective-C API surface, so it is OK for them
+        // to inherit from hidden types.
+        if (!declaration.visibility.isPublicAPI) return
         val session = context.session
+        // No need to report anything on class that is hidden itself.
         if (checkIsHiddenFromObjC(declaration.symbol, session)) {
             return
         }
