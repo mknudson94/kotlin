@@ -8,7 +8,7 @@ package kotlin.native
 annotation class HidesFromObjC
 
 @HidesFromObjC
-@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 annotation class HiddenFromObjC
 
@@ -131,4 +131,42 @@ interface I {
 
 open class Derived2 : Derived() {
     override fun foo() {}
+}
+
+@HiddenFromObjC
+open class OpenHiddenClass
+
+class InheritsFromOpenHiddenClass : <!INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS!>OpenHiddenClass<!>()
+
+@HiddenFromObjC
+interface HiddenInterface
+
+interface NotHiddenInterface
+
+<!IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE!>class ImplementsHiddenInterface : NotHiddenInterface, HiddenInterface<!>
+
+@HiddenFromObjC
+class OuterHidden {
+    class Nested {
+        open class Nested
+    }
+}
+
+class InheritsFromNested : <!INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS!>OuterHidden.Nested.Nested<!>()
+
+@HiddenFromObjC
+enum class MyHiddenEnum {
+    A,
+    B,
+    C
+}
+
+@HiddenFromObjC
+object MyHiddenObject
+
+sealed class MySealedClass {
+    @HiddenFromObjC
+    class MyHiddenSealedVariant : MySealedClass()
+
+    class MyPublicVariant : MySealedClass()
 }
