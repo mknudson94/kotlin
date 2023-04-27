@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.ir.interpreter.fqName
 import org.jetbrains.kotlin.ir.interpreter.isAccessToNotNullableObject
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
@@ -59,9 +60,12 @@ class IrCompileTimeChecker(
     }
 
     private fun visitConstructor(expression: IrFunctionAccessExpression): Boolean {
-        if (!mode.canEvaluateFunction(expression.symbol.owner, contextExpression)) return false
+        val constructor = expression.symbol.owner
+
+        if (!mode.canEvaluateFunction(constructor, contextExpression)) return false
         if (!visitValueArguments(expression, null)) return false
-        return expression.symbol.owner.visitBodyIfNeeded()
+        return constructor.visitBodyIfNeeded() &&
+                constructor.parentAsClass.declarations.filterIsInstance<IrAnonymousInitializer>().all { it.accept(this, null) }
     }
 
     private fun IrFunction.visitBodyIfNeeded(): Boolean {
@@ -266,12 +270,11 @@ class IrCompileTimeChecker(
     }
 
     override fun visitFunctionExpression(expression: IrFunctionExpression, data: Nothing?): Boolean {
-        if (mode == EvaluationMode.ONLY_BUILTINS || mode == EvaluationMode.ONLY_INTRINSIC_CONST) return false
+        val body = expression.function.body ?: return false
         val isLambda = expression.origin == IrStatementOrigin.LAMBDA || expression.origin == IrStatementOrigin.ANONYMOUS_FUNCTION
         val isCompileTime = mode.canEvaluateFunction(expression.function)
-        return expression.function.asVisited {
-            if (isLambda || isCompileTime) expression.function.body?.accept(this, data) == true else false
-        }
+        if (!isLambda && !isCompileTime) return false
+        return expression.function.asVisited { body.accept(this, data) }
     }
 
     override fun visitTypeOperator(expression: IrTypeOperatorCall, data: Nothing?): Boolean {
