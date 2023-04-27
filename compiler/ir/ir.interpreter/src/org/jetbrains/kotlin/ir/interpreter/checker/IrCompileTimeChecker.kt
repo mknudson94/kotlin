@@ -69,7 +69,8 @@ class IrCompileTimeChecker(
     }
 
     private fun IrFunction.visitBodyIfNeeded(): Boolean {
-        return this.asVisited { !mode.mustCheckBodyOf(this) || (this.body?.accept(this@IrCompileTimeChecker, null) ?: true) }
+        if (!mode.mustCheckBodyOf(this)) return true
+        return this.asVisited { this.body?.accept(this@IrCompileTimeChecker, null) ?: true }
     }
 
     private fun IrCall.isGetterToConstVal(): Boolean {
