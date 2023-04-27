@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.expressions.IrErrorExpression
+import org.jetbrains.kotlin.ir.expressions.IrVararg
 import org.jetbrains.kotlin.ir.interpreter.IrInterpreter
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 
@@ -31,7 +32,7 @@ internal class IrConstDeclarationAnnotationTransformer(
             declaration.primaryConstructor?.valueParameters?.forEach {
                 val defaultExpression = it.defaultValue?.expression ?: return@forEach
                 if (defaultExpression.canBeInterpreted()) {
-                    it.defaultValue?.expression = defaultExpression.interpret(failAsError = false)
+                    it.defaultValue?.expression = transformAnnotationArgument(defaultExpression, it)
                 }
             }
         }
