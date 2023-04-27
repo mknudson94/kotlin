@@ -60,6 +60,10 @@ object ErrorsNative {
     val INCOMPATIBLE_OBJC_REFINEMENT_OVERRIDE = DiagnosticFactory2.create<KtElement, DeclarationDescriptor, Collection<DeclarationDescriptor>>(Severity.ERROR)
     @JvmField
     val INVALID_OBJC_REFINEMENT_TARGETS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
+    @JvmField
+    val INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
+    @JvmField
+    val IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
 
     init {
         Errors.Initializer.initializeFactoryNames(ErrorsNative::class.java)

@@ -66,6 +66,14 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             ErrorsNative.INVALID_OBJC_REFINEMENT_TARGETS,
             "Refines annotations are only applicable to annotations with targets CLASS, FUNCTION and/or PROPERTY"
         )
+        put(
+            ErrorsNative.INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS,
+            "Only @HiddenFromObjC declaration can inherit from class annotated with @HiddenFromObjC"
+        )
+        put(
+            ErrorsNative.IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE,
+            "Only @HiddenFromObjC declaration can implement interface annotated with @HiddenFromObjC"
+        )
     }
 }
 
