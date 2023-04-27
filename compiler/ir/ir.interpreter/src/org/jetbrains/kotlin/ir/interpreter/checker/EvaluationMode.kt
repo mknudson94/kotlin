@@ -18,8 +18,8 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-enum class EvaluationMode(protected val mustCheckBody: Boolean) {
-    FULL(mustCheckBody = true) {
+enum class EvaluationMode {
+    FULL {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean = true
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
         override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = true
@@ -30,9 +30,11 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateComposite(composite: IrComposite): Boolean = true
 
         override fun canEvaluateExpression(expression: IrExpression): Boolean = true
+
+        override fun mustCheckBodyOf(function: IrFunction): Boolean = true
     },
 
-    ONLY_BUILTINS(mustCheckBody = false) {
+    ONLY_BUILTINS {
         private val allowedMethodsOnPrimitives = setOf(
             "not", "unaryMinus", "unaryPlus", "inv",
             "toString", "toChar", "toByte", "toShort", "toInt", "toLong", "toFloat", "toDouble",
@@ -79,7 +81,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateExpression(expression: IrExpression): Boolean = expression is IrCall
     },
 
-    ONLY_INTRINSIC_CONST(mustCheckBody = false) {
+    ONLY_INTRINSIC_CONST {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean {
             return function.isCompileTimePropertyAccessor() ||
                     function.isMarkedAsIntrinsicConstEvaluation() ||
@@ -125,13 +127,11 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
     open fun canEvaluateExpression(expression: IrExpression): Boolean = false
 
-    fun mustCheckBodyOf(function: IrFunction): Boolean {
-        if (function.property != null) return true
-        return (mustCheckBody || function.isLocal) && !function.isContract()
+    open fun mustCheckBodyOf(function: IrFunction): Boolean {
+        return function.property != null
     }
 
     protected fun IrDeclaration.isMarkedAsIntrinsicConstEvaluation() = isMarkedWith(intrinsicConstEvaluationAnnotation)
-    private fun IrDeclaration.isContract() = isMarkedWith(contractsDslAnnotation)
 
     protected fun IrDeclaration.isMarkedWith(annotation: FqName): Boolean {
         if (this is IrClass && this.isCompanion) return false
