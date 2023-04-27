@@ -127,9 +127,7 @@ enum class EvaluationMode {
 
     open fun canEvaluateExpression(expression: IrExpression): Boolean = false
 
-    open fun mustCheckBodyOf(function: IrFunction): Boolean {
-        return function.property != null
-    }
+    open fun mustCheckBodyOf(function: IrFunction): Boolean = false
 
     protected fun IrDeclaration.isMarkedAsIntrinsicConstEvaluation() = isMarkedWith(intrinsicConstEvaluationAnnotation)
 
