@@ -32,43 +32,6 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateExpression(expression: IrExpression): Boolean = true
     },
 
-    WITH_ANNOTATIONS(mustCheckBody = false) {
-        override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean {
-            if (function.isCompileTimePropertyAccessor()) return true
-            return function.isMarkedAsCompileTime() || function.origin == IrBuiltIns.BUILTIN_OPERATOR ||
-                    (function is IrSimpleFunction && function.isOperator && function.name.asString() == "invoke") ||
-                    (function is IrSimpleFunction && function.isFakeOverride && function.overriddenSymbols.any { canEvaluateFunction(it.owner) }) ||
-                    function.isCompileTimeTypeAlias()
-        }
-
-        private fun IrFunction?.isCompileTimePropertyAccessor(): Boolean {
-            val property = this?.property ?: return false
-            if (property.isConst) return true
-            if (property.isMarkedAsCompileTime() || property.isCompileTimeTypeAlias()) return true
-
-            val backingField = property.backingField
-            val backingFieldExpression = backingField?.initializer?.expression as? IrGetValue
-            return backingFieldExpression?.origin == IrStatementOrigin.INITIALIZE_PROPERTY_FROM_PARAMETER
-        }
-
-        override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
-
-        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean {
-            val isLambda = expression.origin == IrStatementOrigin.LAMBDA || expression.origin == IrStatementOrigin.ANONYMOUS_FUNCTION
-            val isCompileTime = canEvaluateFunction(expression.function)
-            return isLambda || isCompileTime
-        }
-
-        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
-
-        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean {
-            return (reference.symbol.owner as IrClass).isMarkedAsCompileTime()
-        }
-
-        override fun canEvaluateBlock(block: IrBlock): Boolean = true
-        override fun canEvaluateExpression(expression: IrExpression): Boolean = true
-    },
-
     ONLY_BUILTINS(mustCheckBody = false) {
         private val allowedMethodsOnPrimitives = setOf(
             "not", "unaryMinus", "unaryPlus", "inv",
@@ -164,18 +127,11 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
     fun mustCheckBodyOf(function: IrFunction): Boolean {
         if (function.property != null) return true
-        return (mustCheckBody || function.isLocal) && !function.isContract() && !function.isMarkedAsEvaluateIntrinsic()
+        return (mustCheckBody || function.isLocal) && !function.isContract()
     }
 
-    protected val compileTimeTypeAliases = setOf(
-        "java.lang.StringBuilder", "java.lang.IllegalArgumentException", "java.util.NoSuchElementException"
-    )
-
-    protected fun IrDeclaration.isMarkedAsCompileTime() = isMarkedWith(compileTimeAnnotation)
     protected fun IrDeclaration.isMarkedAsIntrinsicConstEvaluation() = isMarkedWith(intrinsicConstEvaluationAnnotation)
     private fun IrDeclaration.isContract() = isMarkedWith(contractsDslAnnotation)
-    private fun IrDeclaration.isMarkedAsEvaluateIntrinsic() = isMarkedWith(evaluateIntrinsicAnnotation)
-    protected fun IrDeclaration.isCompileTimeTypeAlias() = this.parentClassOrNull?.fqName in compileTimeTypeAliases
 
     protected fun IrDeclaration.isMarkedWith(annotation: FqName): Boolean {
         if (this is IrClass && this.isCompanion) return false
