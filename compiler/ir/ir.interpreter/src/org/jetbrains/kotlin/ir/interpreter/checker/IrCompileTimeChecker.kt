@@ -309,7 +309,6 @@ class IrCompileTimeChecker(
     }
 
     override fun visitTry(aTry: IrTry, data: Nothing?): Boolean {
-        if (mode == EvaluationMode.ONLY_BUILTINS || mode == EvaluationMode.ONLY_INTRINSIC_CONST) return false
         if (!aTry.tryResult.accept(this, data)) return false
         if (aTry.finallyExpression != null && aTry.finallyExpression?.accept(this, data) == false) return false
         return aTry.catches.all { it.result.accept(this, data) }
