@@ -46,17 +46,8 @@ class IrCompileTimeChecker(
         return (this as? IrDeclarationContainer)?.declarations ?: (this as? IrStatementContainer)?.statements ?: emptyList()
     }
 
-    private fun visitStatements(container: IrElement, statements: List<IrStatement>): Boolean {
-        when {
-            mode == EvaluationMode.ONLY_INTRINSIC_CONST && container is IrBlock && container.origin == IrStatementOrigin.WHEN -> {
-                return statements.all { it.accept(this, null) }
-            }
-            mode == EvaluationMode.ONLY_INTRINSIC_CONST -> {
-                val statement = statements.singleOrNull() ?: return false
-                return statement.accept(this, null)
-            }
-            else -> return statements.all { it.accept(this, null) }
-        }
+    private fun visitStatements(statements: List<IrStatement>): Boolean {
+        return statements.all { it.accept(this, null) }
     }
 
     private fun visitConstructor(expression: IrFunctionAccessExpression): Boolean {
@@ -114,7 +105,7 @@ class IrCompileTimeChecker(
     }
 
     override fun visitBody(body: IrBody, data: Nothing?): Boolean {
-        return visitStatements(body, body.statements)
+        return visitStatements(body.statements)
     }
 
     // We need this separate method to explicitly indicate that IrExpressionBody can be interpreted in any evaluation mode
@@ -131,13 +122,13 @@ class IrCompileTimeChecker(
             if (inlinedBlock != null) return inlinedBlock.inlineCall.accept(this, data)
         }
 
-        return visitStatements(expression, expression.statements)
+        return visitStatements(expression.statements)
     }
 
     override fun visitComposite(expression: IrComposite, data: Nothing?): Boolean {
         if (!mode.canEvaluateComposite(expression)) return false
 
-        return visitStatements(expression, expression.statements)
+        return visitStatements(expression.statements)
     }
 
     override fun visitSyntheticBody(body: IrSyntheticBody, data: Nothing?): Boolean {
