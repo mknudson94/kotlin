@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.AnnotationChecker
-import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
@@ -54,21 +53,15 @@ object NativeObjCRefinementAnnotationChecker : DeclarationChecker {
         val targets = AnnotationChecker.applicableTargetSet(descriptor)
         objCAnnotation?.let {
             if ((targets - hidesFromObjCSupportedTargets).isNotEmpty()) {
-                context.trace.reportInvalidAnnotationTargets(declaration, it)
+                val reportLocation = DescriptorToSourceUtils.getSourceFromAnnotation(it) ?: declaration
+                context.trace.report(ErrorsNative.INVALID_OBJC_HIDES_TARGETS.on(reportLocation))
             }
         }
         swiftAnnotation?.let {
             if ((targets - refinesInSwiftSupportedTargets).isNotEmpty()) {
-                context.trace.reportInvalidAnnotationTargets(declaration, it)
+                val reportLocation = DescriptorToSourceUtils.getSourceFromAnnotation(it) ?: declaration
+                context.trace.report(ErrorsNative.INVALID_REFINES_IN_SWIFT_TARGETS.on(reportLocation))
             }
         }
-    }
-
-    private fun BindingTrace.reportInvalidAnnotationTargets(
-        declaration: KtDeclaration,
-        annotation: AnnotationDescriptor
-    ) {
-        val reportLocation = DescriptorToSourceUtils.getSourceFromAnnotation(annotation) ?: declaration
-        report(ErrorsNative.INVALID_OBJC_REFINEMENT_TARGETS.on(reportLocation))
     }
 }

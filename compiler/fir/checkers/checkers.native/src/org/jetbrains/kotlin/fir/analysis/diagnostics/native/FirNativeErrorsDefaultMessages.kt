@@ -24,10 +24,11 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCO
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCOMPATIBLE_THROWS_OVERRIDE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_CHARACTERS_NATIVE
+import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_HIDES_TARGETS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_NAME
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_NAME_CHARS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_NAME_FIRST_CHAR
-import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS
+import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_REFINES_IN_SWIFT_TARGETS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.MISSING_EXACT_OBJC_NAME
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.MISSING_EXCEPTION_IN_THROWS_ON_SUSPEND
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.REDUNDANT_SWIFT_REFINEMENT
@@ -62,8 +63,12 @@ object FirNativeErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
             SYMBOLS
         )
         map.put(
-            INVALID_OBJC_REFINEMENT_TARGETS,
-            "Refines annotations are only applicable to annotations with targets CLASS, FUNCTION and/or PROPERTY"
+            INVALID_OBJC_HIDES_TARGETS,
+            "@HidesFromObjC annotation is only applicable to annotations with targets CLASS, FUNCTION and/or PROPERTY"
+        )
+        map.put(
+            INVALID_REFINES_IN_SWIFT_TARGETS,
+            "@RefinesInSwift annotation is only applicable to annotations with targets FUNCTION and/or PROPERTY"
         )
         map.put(INAPPLICABLE_OBJC_NAME, "@ObjCName is not applicable on overrides")
         map.put(INVALID_OBJC_NAME, "@ObjCName should have a name and/or swiftName")

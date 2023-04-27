@@ -21,7 +21,7 @@ annotation class RefinesInSwift
 @Retention(AnnotationRetention.BINARY)
 public annotation class ShouldRefineInSwift
 
-<!INVALID_OBJC_REFINEMENT_TARGETS!>@RefinesInSwift<!>
+<!INVALID_REFINES_IN_SWIFT_TARGETS!>@RefinesInSwift<!>
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 public annotation class WrongShouldRefineInSwift
@@ -49,12 +49,12 @@ import plugin.PluginShouldRefineInSwift
 @Retention(AnnotationRetention.BINARY)
 annotation class MyRefinedAnnotationA
 
-<!INVALID_OBJC_REFINEMENT_TARGETS!>@HidesFromObjC<!>
+<!INVALID_OBJC_HIDES_TARGETS!>@HidesFromObjC<!>
 @Target(AnnotationTarget.PROPERTY, AnnotationTarget.FILE)
 @Retention(AnnotationRetention.BINARY)
 annotation class MyRefinedAnnotationB
 
-<!INVALID_OBJC_REFINEMENT_TARGETS!>@RefinesInSwift<!>
+<!INVALID_REFINES_IN_SWIFT_TARGETS!>@RefinesInSwift<!>
 @Retention(AnnotationRetention.BINARY)
 annotation class MyRefinedAnnotationC
 

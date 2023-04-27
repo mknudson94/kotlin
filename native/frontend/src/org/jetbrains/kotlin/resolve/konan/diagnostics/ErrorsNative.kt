@@ -59,7 +59,9 @@ object ErrorsNative {
     @JvmField
     val INCOMPATIBLE_OBJC_REFINEMENT_OVERRIDE = DiagnosticFactory2.create<KtElement, DeclarationDescriptor, Collection<DeclarationDescriptor>>(Severity.ERROR)
     @JvmField
-    val INVALID_OBJC_REFINEMENT_TARGETS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
+    val INVALID_OBJC_HIDES_TARGETS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
+    @JvmField
+    val INVALID_REFINES_IN_SWIFT_TARGETS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
     @JvmField
     val INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS = DiagnosticFactory0.create<KtElement>(Severity.ERROR)
     @JvmField

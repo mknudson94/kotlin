@@ -42,12 +42,12 @@ object FirNativeObjCRefinementAnnotationChecker : FirRegularClassChecker() {
 
         objCAnnotation?.let {
             if ((targets - hidesFromObjCSupportedTargets).isNotEmpty()) {
-                reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context)
+                reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_HIDES_TARGETS, context)
             }
         }
         swiftAnnotation?.let {
             if ((targets - refinesInSwiftSupportedTargets).isNotEmpty()) {
-                reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context)
+                reporter.reportOn(it.source, FirNativeErrors.INVALID_REFINES_IN_SWIFT_TARGETS, context)
             }
         }
     }
