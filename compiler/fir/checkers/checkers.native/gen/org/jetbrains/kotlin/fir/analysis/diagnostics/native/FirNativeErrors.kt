@@ -45,6 +45,8 @@ object FirNativeErrors {
     val INAPPLICABLE_EXACT_OBJC_NAME by error0<KtElement>()
     val MISSING_EXACT_OBJC_NAME by error0<KtElement>()
     val NON_LITERAL_OBJC_NAME_ARG by error0<KtElement>()
+    val INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS by error0<KtElement>()
+    val IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE by error0<KtElement>()
 
     init {
         RootDiagnosticRendererFactory.registerFactory(FirNativeErrorsDefaultMessages)

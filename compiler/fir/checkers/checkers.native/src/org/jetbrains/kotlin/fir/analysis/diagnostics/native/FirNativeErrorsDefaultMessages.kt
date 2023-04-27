@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers.SYMBOL
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers.SYMBOLS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.EMPTY_OBJC_NAME
+import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INAPPLICABLE_EXACT_OBJC_NAME
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INAPPLICABLE_OBJC_NAME
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INAPPLICABLE_SHARED_IMMUTABLE_PROPERTY
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCO
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCOMPATIBLE_OBJC_REFINEMENT_OVERRIDE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCOMPATIBLE_THROWS_INHERITED
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INCOMPATIBLE_THROWS_OVERRIDE
+import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_CHARACTERS_NATIVE
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_NAME
 import org.jetbrains.kotlin.fir.analysis.diagnostics.native.FirNativeErrors.INVALID_OBJC_NAME_CHARS
@@ -72,5 +74,13 @@ object FirNativeErrorsDefaultMessages : BaseDiagnosticRendererFactory() {
         map.put(INAPPLICABLE_EXACT_OBJC_NAME, "Exact @ObjCName is only applicable to classes, objects and interfaces")
         map.put(MISSING_EXACT_OBJC_NAME, "Exact @ObjCName is required to have an ObjC name")
         map.put(NON_LITERAL_OBJC_NAME_ARG, "@ObjCName accepts only literal string and boolean values")
+        map.put(
+            INHERITS_FROM_HIDDEN_FROM_OBJC_CLASS,
+            "Only @HiddenFromObjC declaration can inherit from class annotated with @HiddenFromObjC"
+        )
+        map.put(
+            IMPLEMENTS_HIDDEN_FROM_OBJC_INTERFACE,
+            "Only @HiddenFromObjC declaration can implement interface annotated with @HiddenFromObjC"
+        )
     }
 }
