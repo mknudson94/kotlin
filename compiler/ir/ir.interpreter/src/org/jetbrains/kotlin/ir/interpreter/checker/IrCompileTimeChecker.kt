@@ -51,7 +51,7 @@ class IrCompileTimeChecker(
             mode == EvaluationMode.ONLY_INTRINSIC_CONST && container is IrBlock && container.origin == IrStatementOrigin.WHEN -> {
                 return statements.all { it.accept(this, null) }
             }
-            mode == EvaluationMode.ONLY_BUILTINS || mode == EvaluationMode.ONLY_INTRINSIC_CONST -> {
+            mode == EvaluationMode.ONLY_INTRINSIC_CONST -> {
                 val statement = statements.singleOrNull() ?: return false
                 return statement.accept(this, null)
             }
@@ -77,6 +77,8 @@ class IrCompileTimeChecker(
     }
 
     override fun visitCall(expression: IrCall, data: Nothing?): Boolean {
+        if (!mode.canEvaluateExpression(expression)) return false
+
         val owner = expression.symbol.owner
         if (!mode.canEvaluateFunction(owner, expression)) return false
 
@@ -120,11 +122,19 @@ class IrCompileTimeChecker(
     }
 
     override fun visitBlock(expression: IrBlock, data: Nothing?): Boolean {
+        if (!mode.canEvaluateBlock(expression)) return false
+
         // `IrReturnableBlock` will be created from IrCall after inline. We should do basically the same check as for IrCall.
         if (expression is IrReturnableBlock) {
             val inlinedBlock = expression.statements.singleOrNull() as? IrInlinedFunctionBlock
             if (inlinedBlock != null) return inlinedBlock.inlineCall.accept(this, data)
         }
+
+        return visitStatements(expression, expression.statements)
+    }
+
+    override fun visitComposite(expression: IrComposite, data: Nothing?): Boolean {
+        if (!mode.canEvaluateComposite(expression)) return false
 
         return visitStatements(expression, expression.statements)
     }
@@ -147,13 +157,6 @@ class IrCompileTimeChecker(
 
     override fun visitSpreadElement(spread: IrSpreadElement, data: Nothing?): Boolean {
         return spread.expression.accept(this, data)
-    }
-
-    override fun visitComposite(expression: IrComposite, data: Nothing?): Boolean {
-        if (expression.origin == IrStatementOrigin.DESTRUCTURING_DECLARATION || expression.origin == null) {
-            return visitStatements(expression, expression.statements)
-        }
-        return false
     }
 
     override fun visitStringConcatenation(expression: IrStringConcatenation, data: Nothing?): Boolean {
@@ -179,6 +182,7 @@ class IrCompileTimeChecker(
 
     override fun visitGetEnumValue(expression: IrGetEnumValue, data: Nothing?): Boolean {
         if (!mode.canEvaluateEnumValue(expression, contextExpression)) return false
+
         // we want to avoid recursion in cases like "enum class E(val srt: String) { OK(OK.name) }"
         if (visitedStack.contains(expression)) return true
         return expression.asVisited {
@@ -257,7 +261,7 @@ class IrCompileTimeChecker(
     }
 
     override fun visitFunctionReference(expression: IrFunctionReference, data: Nothing?): Boolean {
-        if (!mode.canEvaluateReference(expression, contextExpression)) return false
+        if (!mode.canEvaluateCallableReference(expression, contextExpression)) return false
 
         val owner = expression.symbol.owner
         val dispatchReceiverComputable = expression.dispatchReceiver?.accept(this, null) ?: true
@@ -270,8 +274,9 @@ class IrCompileTimeChecker(
     }
 
     override fun visitFunctionExpression(expression: IrFunctionExpression, data: Nothing?): Boolean {
-        val body = expression.function.body ?: return false
         if (!mode.canEvaluateFunctionExpression(expression)) return false
+
+        val body = expression.function.body ?: return false
         return expression.function.asVisited { body.accept(this, data) }
     }
 
@@ -289,6 +294,8 @@ class IrCompileTimeChecker(
     }
 
     override fun visitWhen(expression: IrWhen, data: Nothing?): Boolean {
+        if (!mode.canEvaluateExpression(expression)) return false
+
         return expression.branches.all { it.accept(this, data) }
     }
 
@@ -309,6 +316,8 @@ class IrCompileTimeChecker(
     }
 
     override fun visitTry(aTry: IrTry, data: Nothing?): Boolean {
+        if (!mode.canEvaluateExpression(aTry)) return false
+
         if (!aTry.tryResult.accept(this, data)) return false
         if (aTry.finallyExpression != null && aTry.finallyExpression?.accept(this, data) == false) return false
         return aTry.catches.all { it.result.accept(this, data) }
@@ -324,11 +333,13 @@ class IrCompileTimeChecker(
     }
 
     override fun visitThrow(expression: IrThrow, data: Nothing?): Boolean {
+        if (!mode.canEvaluateExpression(expression)) return false
+
         return expression.value.accept(this, data)
     }
 
     override fun visitPropertyReference(expression: IrPropertyReference, data: Nothing?): Boolean {
-        if (!mode.canEvaluateReference(expression, contextExpression)) return false
+        if (!mode.canEvaluateCallableReference(expression, contextExpression)) return false
 
         val dispatchReceiverComputable = expression.dispatchReceiver?.accept(this, null) ?: true
         val extensionReceiverComputable = expression.extensionReceiver?.accept(this, null) ?: true
@@ -338,6 +349,6 @@ class IrCompileTimeChecker(
     }
 
     override fun visitClassReference(expression: IrClassReference, data: Nothing?): Boolean {
-        return mode.canEvaluateReference(expression)
+        return mode.canEvaluateClassReference(expression)
     }
 }

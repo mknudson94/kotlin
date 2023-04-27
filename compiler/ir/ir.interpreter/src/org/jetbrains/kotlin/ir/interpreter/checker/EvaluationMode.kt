@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.interpreter.*
 import org.jetbrains.kotlin.ir.interpreter.hasAnnotation
-import org.jetbrains.kotlin.ir.types.isAny
 import org.jetbrains.kotlin.ir.types.isPrimitiveType
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.types.isUnsignedType
@@ -24,8 +23,13 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean = true
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
         override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = true
-        override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
-        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = true
+        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
+        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = true
+
+        override fun canEvaluateBlock(block: IrBlock): Boolean = true
+        override fun canEvaluateComposite(composite: IrComposite): Boolean = true
+
+        override fun canEvaluateExpression(expression: IrExpression): Boolean = true
     },
 
     WITH_ANNOTATIONS(mustCheckBody = false) {
@@ -55,10 +59,14 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
             return isLambda || isCompileTime
         }
 
-        override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
-        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean {
+        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
+
+        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean {
             return (reference.symbol.owner as IrClass).isMarkedAsCompileTime()
         }
+
+        override fun canEvaluateBlock(block: IrBlock): Boolean = true
+        override fun canEvaluateExpression(expression: IrExpression): Boolean = true
     },
 
     ONLY_BUILTINS(mustCheckBody = false) {
@@ -102,8 +110,10 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = false
         override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
-        override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = false
-        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
+        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = false
+        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = false
+        override fun canEvaluateBlock(block: IrBlock): Boolean = block.statements.size == 1
+        override fun canEvaluateExpression(expression: IrExpression): Boolean = expression is IrCall
     },
 
     ONLY_INTRINSIC_CONST(mustCheckBody = false) {
@@ -122,12 +132,14 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
             return context.isIntrinsicConstEvaluationNameProperty()
         }
 
-        override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean {
+        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean {
             return context.isIntrinsicConstEvaluationNameProperty()
         }
 
         override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
-        override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
+        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = false
+        override fun canEvaluateBlock(block: IrBlock): Boolean = block.origin == IrStatementOrigin.WHEN || block.statements.size == 1
+        override fun canEvaluateExpression(expression: IrExpression): Boolean = expression is IrCall || expression is IrWhen
 
         private fun IrCall?.isIntrinsicConstEvaluationNameProperty(): Boolean {
             if (this == null) return false
@@ -137,11 +149,18 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         }
     };
 
-    abstract fun canEvaluateFunction(function: IrFunction, context: IrCall? = null): Boolean
-    abstract fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall? = null): Boolean
-    abstract fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall? = null): Boolean
-    abstract fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall? = null): Boolean
-    abstract fun canEvaluateReference(reference: IrDeclarationReference): Boolean
+    open fun canEvaluateFunction(function: IrFunction, context: IrCall? = null): Boolean = false
+    open fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall? = null): Boolean = false
+    open fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall? = null): Boolean = false
+    open fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall? = null): Boolean = false
+    open fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = false
+
+    open fun canEvaluateBlock(block: IrBlock): Boolean = false
+    open fun canEvaluateComposite(composite: IrComposite): Boolean {
+        return composite.origin == IrStatementOrigin.DESTRUCTURING_DECLARATION || composite.origin == null
+    }
+
+    open fun canEvaluateExpression(expression: IrExpression): Boolean = false
 
     fun mustCheckBodyOf(function: IrFunction): Boolean {
         if (function.property != null) return true
