@@ -40,7 +40,8 @@ internal fun DeclarationDescriptor.findObjCExportMetaAnnotations(): ObjCExportMe
 
 object NativeObjCRefinementAnnotationChecker : DeclarationChecker {
 
-    private val supportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY, KotlinTarget.CLASS)
+    private val hidesFromObjCSupportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY, KotlinTarget.CLASS)
+    private val refinesInSwiftSupportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY)
 
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         if (descriptor !is ClassDescriptor || descriptor.kind != ClassKind.ANNOTATION_CLASS) return
@@ -51,10 +52,15 @@ object NativeObjCRefinementAnnotationChecker : DeclarationChecker {
             context.trace.report(ErrorsNative.REDUNDANT_SWIFT_REFINEMENT.on(reportLocation))
         }
         val targets = AnnotationChecker.applicableTargetSet(descriptor)
-        val unsupportedTargets = targets - supportedTargets
-        if (unsupportedTargets.isNotEmpty()) {
-            objCAnnotation?.let { context.trace.reportInvalidAnnotationTargets(declaration, it) }
-            swiftAnnotation?.let { context.trace.reportInvalidAnnotationTargets(declaration, it) }
+        objCAnnotation?.let {
+            if ((targets - hidesFromObjCSupportedTargets).isNotEmpty()) {
+                context.trace.reportInvalidAnnotationTargets(declaration, it)
+            }
+        }
+        swiftAnnotation?.let {
+            if ((targets - refinesInSwiftSupportedTargets).isNotEmpty()) {
+                context.trace.reportInvalidAnnotationTargets(declaration, it)
+            }
         }
     }
 

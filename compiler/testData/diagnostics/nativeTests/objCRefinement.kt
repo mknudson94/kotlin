@@ -21,6 +21,11 @@ annotation class RefinesInSwift
 @Retention(AnnotationRetention.BINARY)
 public annotation class ShouldRefineInSwift
 
+<!INVALID_OBJC_REFINEMENT_TARGETS!>@RefinesInSwift<!>
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.BINARY)
+public annotation class WrongShouldRefineInSwift
+
 // FILE: plugin.kt
 package plugin
 

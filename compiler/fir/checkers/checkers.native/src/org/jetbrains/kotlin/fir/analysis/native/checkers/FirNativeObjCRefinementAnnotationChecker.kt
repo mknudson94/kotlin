@@ -23,7 +23,8 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 
 object FirNativeObjCRefinementAnnotationChecker : FirRegularClassChecker() {
 
-    private val supportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY, KotlinTarget.CLASS)
+    private val hidesFromObjCSupportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY, KotlinTarget.CLASS)
+    private val refinesInSwiftSupportedTargets = arrayOf(KotlinTarget.FUNCTION, KotlinTarget.PROPERTY)
 
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
         if (declaration.classKind != ClassKind.ANNOTATION_CLASS) return
@@ -38,10 +39,16 @@ object FirNativeObjCRefinementAnnotationChecker : FirRegularClassChecker() {
             )
         }
         val targets = declaration.getAllowedAnnotationTargets(session)
-        val unsupportedTargets = targets - supportedTargets
-        if (unsupportedTargets.isNotEmpty()) {
-            objCAnnotation?.let { reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context) }
-            swiftAnnotation?.let { reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context) }
+
+        objCAnnotation?.let {
+            if ((targets - hidesFromObjCSupportedTargets).isNotEmpty()) {
+                reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context)
+            }
+        }
+        swiftAnnotation?.let {
+            if ((targets - refinesInSwiftSupportedTargets).isNotEmpty()) {
+                reporter.reportOn(it.source, FirNativeErrors.INVALID_OBJC_REFINEMENT_TARGETS, context)
+            }
         }
     }
 }
