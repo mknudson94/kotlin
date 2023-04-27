@@ -73,10 +73,6 @@ enum class EvaluationMode {
             }
         }
 
-        override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = false
-        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
-        override fun canEvaluateCallableReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = false
-        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = false
         override fun canEvaluateBlock(block: IrBlock): Boolean = block.statements.size == 1
         override fun canEvaluateExpression(expression: IrExpression): Boolean = expression is IrCall
     },
@@ -101,8 +97,6 @@ enum class EvaluationMode {
             return context.isIntrinsicConstEvaluationNameProperty()
         }
 
-        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
-        override fun canEvaluateClassReference(reference: IrDeclarationReference): Boolean = false
         override fun canEvaluateBlock(block: IrBlock): Boolean = block.origin == IrStatementOrigin.WHEN || block.statements.size == 1
         override fun canEvaluateExpression(expression: IrExpression): Boolean = expression is IrCall || expression is IrWhen
 
