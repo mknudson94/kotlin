@@ -23,6 +23,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
     FULL(mustCheckBody = true) {
         override fun canEvaluateFunction(function: IrFunction, context: IrCall?): Boolean = true
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
+        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = true
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
         override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = true
     },
@@ -47,6 +48,13 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         }
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = true
+
+        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean {
+            val isLambda = expression.origin == IrStatementOrigin.LAMBDA || expression.origin == IrStatementOrigin.ANONYMOUS_FUNCTION
+            val isCompileTime = canEvaluateFunction(expression.function)
+            return isLambda || isCompileTime
+        }
+
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = true
         override fun canEvaluateReference(reference: IrDeclarationReference): Boolean {
             return (reference.symbol.owner as IrClass).isMarkedAsCompileTime()
@@ -93,6 +101,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
         }
 
         override fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall?): Boolean = false
+        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
         override fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall?): Boolean = false
         override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
     },
@@ -117,6 +126,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
             return context.isIntrinsicConstEvaluationNameProperty()
         }
 
+        override fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall?): Boolean = false
         override fun canEvaluateReference(reference: IrDeclarationReference): Boolean = false
 
         private fun IrCall?.isIntrinsicConstEvaluationNameProperty(): Boolean {
@@ -129,6 +139,7 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
 
     abstract fun canEvaluateFunction(function: IrFunction, context: IrCall? = null): Boolean
     abstract fun canEvaluateEnumValue(enumEntry: IrGetEnumValue, context: IrCall? = null): Boolean
+    abstract fun canEvaluateFunctionExpression(expression: IrFunctionExpression, context: IrCall? = null): Boolean
     abstract fun canEvaluateReference(reference: IrCallableReference<*>, context: IrCall? = null): Boolean
     abstract fun canEvaluateReference(reference: IrDeclarationReference): Boolean
 

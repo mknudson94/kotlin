@@ -271,9 +271,7 @@ class IrCompileTimeChecker(
 
     override fun visitFunctionExpression(expression: IrFunctionExpression, data: Nothing?): Boolean {
         val body = expression.function.body ?: return false
-        val isLambda = expression.origin == IrStatementOrigin.LAMBDA || expression.origin == IrStatementOrigin.ANONYMOUS_FUNCTION
-        val isCompileTime = mode.canEvaluateFunction(expression.function)
-        if (!isLambda && !isCompileTime) return false
+        if (!mode.canEvaluateFunctionExpression(expression)) return false
         return expression.function.asVisited { body.accept(this, data) }
     }
 
