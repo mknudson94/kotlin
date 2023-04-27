@@ -86,7 +86,6 @@ enum class EvaluationMode(protected val mustCheckBody: Boolean) {
                 parentType == null -> fqName in allowedExtensionFunctions || fqName in allowedBuiltinExtensionFunctions
                 parentType.isPrimitiveType() -> function.name.asString() in allowedMethodsOnPrimitives
                 parentType.isString() -> function.name.asString() in allowedMethodsOnStrings
-                parentType.isAny() -> function.name.asString() == "toString" && context?.dispatchReceiver !is IrGetObjectValue
                 parent.isObject -> parent.parentClassOrNull?.defaultType?.let { it.isPrimitiveType() || it.isUnsigned() } == true
                 parentType.isUnsignedType() && function is IrConstructor -> true
                 else -> fqName in allowedExtensionFunctions || fqName in allowedBuiltinExtensionFunctions
