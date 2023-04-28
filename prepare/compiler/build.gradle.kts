@@ -117,7 +117,8 @@ val distCompilerPluginProjects = listOf(
     ":kotlin-sam-with-receiver-compiler-plugin",
     ":kotlinx-serialization-compiler-plugin",
     ":kotlin-lombok-compiler-plugin",
-    ":kotlin-assignment-compiler-plugin"
+    ":kotlin-assignment-compiler-plugin",
+    ":kotlin-scripting-compiler"
 )
 
 val distSourcesProjects = listOfNotNull(
