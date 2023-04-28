@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrStringConcatenationImpl
 import org.jetbrains.kotlin.ir.interpreter.IrInterpreter
 import org.jetbrains.kotlin.ir.interpreter.checker.EvaluationMode
+import org.jetbrains.kotlin.ir.interpreter.checker.IrInterpreterChecker
 import org.jetbrains.kotlin.ir.interpreter.createGetField
 import kotlin.math.max
 import kotlin.math.min
@@ -23,11 +24,12 @@ internal class IrConstExpressionTransformer(
     interpreter: IrInterpreter,
     irFile: IrFile,
     mode: EvaluationMode,
+    checker: IrInterpreterChecker,
     evaluatedConstTracker: EvaluatedConstTracker?,
     onWarning: (IrFile, IrElement, IrErrorExpression) -> Unit,
     onError: (IrFile, IrElement, IrErrorExpression) -> Unit,
     suppressExceptions: Boolean,
-) : IrConstTransformer(interpreter, irFile, mode, evaluatedConstTracker, onWarning, onError, suppressExceptions) {
+) : IrConstTransformer(interpreter, irFile, mode, checker, evaluatedConstTracker, onWarning, onError, suppressExceptions) {
     override fun visitCall(expression: IrCall, data: Nothing?): IrElement {
         if (expression.canBeInterpreted()) {
             return expression.interpret(failAsError = false)
@@ -55,6 +57,7 @@ internal class IrConstExpressionTransformer(
         )
 
         fun IrExpression.wrapInToStringConcatAndInterpret(): IrExpression = wrapInStringConcat().interpret(failAsError = false)
+        fun IrExpression.getConstStringOrEmpty(): String = (this as? IrConst<*>)?.value?.toString() ?: ""
 
         // here `StringBuilder`'s list is used to optimize memory, everything works without it
         val folded = mutableListOf<IrExpression>()
@@ -64,18 +67,18 @@ internal class IrConstExpressionTransformer(
             when {
                 !next.wrapInStringConcat().canBeInterpreted() -> {
                     folded += next
-                    buildersList.add(StringBuilder())
+                    buildersList.add(StringBuilder(next.getConstStringOrEmpty()))
                 }
                 last == null || !last.wrapInStringConcat().canBeInterpreted() -> {
                     val result = next.wrapInToStringConcatAndInterpret()
                     folded += result
-                    buildersList.add(StringBuilder((result as? IrConst<*>)?.value?.toString() ?: ""))
+                    buildersList.add(StringBuilder(result.getConstStringOrEmpty()))
                 }
                 else -> {
                     val nextAsConst = next.wrapInToStringConcatAndInterpret()
                     if (nextAsConst !is IrConst<*>) {
                         folded += next
-                        buildersList.add(StringBuilder())
+                        buildersList.add(StringBuilder(next.getConstStringOrEmpty()))
                     } else {
                         folded[folded.size - 1] = IrConstImpl.string(
                             // Inlined strings may have `last.startOffset > next.endOffset`
