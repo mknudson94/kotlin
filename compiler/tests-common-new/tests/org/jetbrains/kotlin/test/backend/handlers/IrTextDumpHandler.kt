@@ -60,9 +60,15 @@ class IrTextDumpHandler(testServices: TestServices) : AbstractIrHandler(testServ
 
     override fun processModule(module: TestModule, info: IrBackendInput) {
         if (DUMP_IR !in module.directives) return
-        val irFiles = info.irModuleFragment.files
-        val testFileToIrFile = irFiles.groupWithTestFiles(module)
         val builder = baseDumper.builderForModule(module)
+
+        val dependentIrModuleFragments = (info as? IrBackendInput.JvmIrBackendInput)?.dependentInputs?.map { it.irModuleFragment }
+            ?: (info as? IrBackendInput.JsIrBackendInput)?.dependentModuleFragments
+            ?: emptyList()
+
+        val irFiles = (dependentIrModuleFragments + info.irModuleFragment).flatMap { it.files }
+        val testFileToIrFile = irFiles.groupWithTestFiles(module)
+
         for ((testFile, irFile) in testFileToIrFile) {
             if (testFile?.directives?.contains(EXTERNAL_FILE) == true) continue
             var actualDump = irFile.dumpTreesFromLineNumber(lineNumber = 0, normalizeNames = true)
@@ -71,6 +77,7 @@ class IrTextDumpHandler(testServices: TestServices) : AbstractIrHandler(testServ
             }
             builder.append(actualDump)
         }
+
         compareDumpsOfExternalClasses(module, info)
     }
 
