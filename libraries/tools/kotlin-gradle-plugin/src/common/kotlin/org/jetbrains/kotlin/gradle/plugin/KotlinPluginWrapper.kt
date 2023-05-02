@@ -257,6 +257,11 @@ abstract class KotlinBasePluginWrapper : DefaultKotlinBasePlugin() {
     ): Plugin<Project>
 
     private fun Project.scheduleDiagnosticChecksAndReporting() {
+        tasks.withType(UsesKotlinToolingDiagnostics::class.java).configureEach {
+            it.usesService(kotlinToolingDiagnosticsCollectorProvider)
+            it.toolingDiagnosticsCollector.value(kotlinToolingDiagnosticsCollectorProvider)
+        }
+
         launchInStage(KotlinPluginLifecycle.Stage.ReadyForExecution) {
             // Do not run checkers on projects which configuration finished with failure,
             // as the internal state can not be trusted at this point (e.g. not entire of the
@@ -273,6 +278,13 @@ abstract class KotlinBasePluginWrapper : DefaultKotlinBasePlugin() {
                 project.logger,
                 project.kotlinPropertiesProvider.internalVerboseDiagnostics
             )
+        }
+
+        // Schedule switching of Collector to transparent mode, so that any diagnostics reported
+        // after projects are evaluated will be transparently rendered right away instead of being
+        // silently swallowed
+        project.gradle.projectsEvaluated {
+            kotlinToolingDiagnosticsCollector.switchToTransparentMode()
         }
     }
 }
