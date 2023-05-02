@@ -12,13 +12,18 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationBase
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.transformInPlace
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 
 /**
- *  It actualizes fake override expect members in base and inherited not expect classes
- *  It uses @property expectActualMap as cache of already actualized members
+ * It actualizes expect fake overrides in non-expect classes inside common or multi-platform module.
+ *
+ * When some non-expect class inside a common or multi-platform module has an expect base class,
+ * FIR2IR generates expect fake overrides overriding the expect base class members for this non-expect class which is not correct for the backend.
+ * This Actualizer processes expect overridable declarations in non-expect classes and replaces them with the associated actual overridable
+ * declarations overriding the actual base class members.The newly created actual fake overrides are stored in expectActualMap.
  */
 internal class FakeOverridesActualizer(private val expectActualMap: MutableMap<IrSymbol, IrSymbol>) : IrElementVisitorVoid {
     override fun visitClass(declaration: IrClass) {
@@ -32,14 +37,12 @@ internal class FakeOverridesActualizer(private val expectActualMap: MutableMap<I
         element.acceptChildrenVoid(this)
     }
 
-    private fun actualizeFakeOverrides(declaration: IrClass) {
-        fun IrDeclaration.actualize(): IrDeclaration? {
+    private fun actualizeFakeOverrides(klass: IrClass) {
+        fun IrDeclaration.actualize(): IrDeclaration {
             (expectActualMap[symbol]?.owner as? IrDeclaration)?.let { return it }
 
             require(this is IrOverridableDeclaration<*>)
-            // It returns null if there is no actual member (diagnostics should be reported earlier)
-            if (overriddenSymbols.isEmpty()) return null
-            val actualizedOverrides = overriddenSymbols.mapNotNull { (it.owner as IrDeclaration).actualize() }
+            val actualizedOverrides = overriddenSymbols.map { (it.owner as IrDeclaration).actualize() }
             val actualFakeOverride = createFakeOverrideMember(actualizedOverrides, parent as IrClass)
 
             expectActualMap.addLink(this as IrDeclarationBase, actualFakeOverride)
@@ -47,6 +50,6 @@ internal class FakeOverridesActualizer(private val expectActualMap: MutableMap<I
             return actualFakeOverride
         }
 
-        declaration.declarations.transformInPlace { if (it.isExpect) it.actualize() ?: it else it }
+        klass.declarations.transformInPlace { if (it.isExpect && it.isFakeOverride) it.actualize() else it }
     }
 }
