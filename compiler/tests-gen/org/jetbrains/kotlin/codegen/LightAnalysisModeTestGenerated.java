@@ -27072,6 +27072,11 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
                     runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualFakeOverridesWithTypeParameters.kt");
                 }
 
+                @TestMetadata("expectActualFakeOverridesWithTypeParameters2.kt")
+                public void ignoreExpectActualFakeOverridesWithTypeParameters2() throws Exception {
+                    runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualFakeOverridesWithTypeParameters2.kt");
+                }
+
                 @TestMetadata("expectActualIntersectionOverride.kt")
                 public void ignoreExpectActualIntersectionOverride() throws Exception {
                     runTest("compiler/testData/codegen/box/multiplatform/k2/basic/expectActualIntersectionOverride.kt");
