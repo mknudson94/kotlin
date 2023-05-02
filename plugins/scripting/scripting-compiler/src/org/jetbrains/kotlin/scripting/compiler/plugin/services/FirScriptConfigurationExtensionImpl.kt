@@ -129,7 +129,7 @@ class FirScriptConfiguratorExtensionImpl(
             compilationConfiguration[ScriptCompilationConfiguration.resultField]?.takeIf { it.isNotBlank() }?.let { resultFieldName ->
                 val lastExpression = statements.lastOrNull()
                 if (lastExpression != null && lastExpression is FirExpression) {
-                    statements.dropLast(1)
+                    statements.removeAt(statements.size - 1)
                     statements.add(
                         buildProperty {
                             this.name = Name.identifier(resultFieldName)

@@ -205,7 +205,10 @@ class Fir2IrVisitor(
                     if (statement is FirDeclaration) {
                         val irDeclaration = statement.accept(this@Fir2IrVisitor, null) as IrDeclaration
                         irScript.statements.add(irDeclaration)
-                        if (script.resultPropertyName != null && (statement as? FirProperty)?.name == script.resultPropertyName) {
+                        if (script.resultPropertyName != null &&
+                            (statement as? FirProperty)?.name == script.resultPropertyName &&
+                                (irDeclaration as IrProperty).backingField?.type?.isUnit() == false
+                        ) {
                             irScript.resultProperty = (irDeclaration as? IrProperty)?.symbol
                         }
                     } else {
