@@ -1,5 +1,6 @@
 import org.gradle.crypto.checksum.Checksum
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 
 buildscript {
@@ -953,4 +954,18 @@ afterEvaluate {
 
 afterEvaluate {
     checkExpectedGradlePropertyValues()
+}
+
+tasks.register("resolveDependencies") {
+    doFirst {
+        allprojects {
+            configurations.findByName("compileClasspath")?.resolve()
+            configurations.findByName("testCompileClasspath")?.resolve()
+            plugins.withId("java-base") {
+                val service = project.extensions.getByType<JavaToolchainService>()
+                val javaExtension = extensions.getByType<JavaPluginExtension>()
+                service.compilerFor(javaExtension.toolchain).get()
+            }
+        }
+    }
 }
