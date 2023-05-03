@@ -103,7 +103,7 @@ class JsNameLinkingNamer(
         val declarationStableName = getJsNameOrKotlinName().identifier
 
         if (isEsModules) {
-            val importedName = jsQualifier?.firstOrNull() ?: declarationStableName.toJsName()
+            val importedName = jsQualifier?.firstOrNull() ?: declarationStableName.toJsName(temporary = false)
             val importStatement = JsImport(fileJsModule, JsImport.Element(importedName))
             imports[this] = when (val qualifiedReference = jsQualifier?.makeRef()) {
                 null -> importStatement
