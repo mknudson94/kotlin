@@ -1302,7 +1302,7 @@ open class RawFirBuilder(
                         ) {
                             val zippedParameters =
                                 classOrObject.primaryConstructorParameters.filter { it.hasValOrVar() } zip declarations.filterIsInstance<FirProperty>()
-                            DataClassMembersGenerator(
+                            ValueAndDataClassMembersGenerator(
                                 classOrObject,
                                 this,
                                 zippedParameters,

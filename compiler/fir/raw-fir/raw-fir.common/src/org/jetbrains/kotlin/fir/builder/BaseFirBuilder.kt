@@ -836,7 +836,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
         }
     }
 
-    inner class DataClassMembersGenerator(
+    inner class ValueAndDataClassMembersGenerator(
         private val source: T,
         private val classBuilder: FirRegularClassBuilder,
         private val zippedParameters: List<Pair<T, FirProperty>>,
@@ -939,7 +939,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
         private fun FirSimpleFunctionBuilder.generateSyntheticFunction(
             name: Name,
             source: KtSourceElement? =
-                this@DataClassMembersGenerator.source.toFirSourceElement(KtFakeSourceElementKind.DataClassGeneratedMembers),
+                this@ValueAndDataClassMembersGenerator.source.toFirSourceElement(KtFakeSourceElementKind.DataClassGeneratedMembers),
             isOperator: Boolean = false,
         ) {
             this.source = source
