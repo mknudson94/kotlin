@@ -78,7 +78,7 @@ abstract class AbstractFirUseSiteMemberScope(
             if (!symbol.isVisibleInCurrentClass()) return@processFunctionsByName
             val directOverridden = computeDirectOverriddenForDeclaredFunction(symbol)
             if (symbol.source?.kind == KtFakeSourceElementKind.DataClassGeneratedMembers && name in ANY_MEMBER_NAMES) {
-                if (directOverridden.any { it.chosenSymbol.isFinal }) {
+                if (directOverridden.any { it.chosenSymbol.fir.isFinal }) {
                     return@processFunctionsByName
                 }
                 if (destination.isNotEmpty()) {
