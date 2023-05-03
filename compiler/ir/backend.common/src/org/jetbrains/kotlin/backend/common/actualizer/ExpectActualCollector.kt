@@ -22,12 +22,12 @@ internal class ExpectActualCollector(
     private val dependentFragments: List<IrModuleFragment>,
     private val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
 ) {
-    fun collect(): Pair<MutableMap<IrSymbol, IrSymbol>, Map<FqName, FqName>> {
+    fun collect(): MutableMap<IrSymbol, IrSymbol> {
         val result = mutableMapOf<IrSymbol, IrSymbol>()
         // Collect and link classes at first to make it possible to expand type aliases on the members linking
         val (actualMembers, expectActualTypeAliasMap) = result.appendExpectActualClassMap()
         result.appendExpectActualMemberMap(actualMembers, expectActualTypeAliasMap)
-        return result to expectActualTypeAliasMap
+        return result
     }
 
     private fun MutableMap<IrSymbol, IrSymbol>.appendExpectActualClassMap(): Pair<List<IrDeclarationBase>, Map<FqName, FqName>> {

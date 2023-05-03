@@ -25,14 +25,15 @@ object IrActualizer {
 
         // The ir modules processing is performed phase-to-phase:
         //   1. Collect expect-actual links for classes and their members from dependent fragments
-        val (expectActualMap, expectActualTypeAliasMap) = ExpectActualCollector(
+        val expectActualMap = ExpectActualCollector(
             mainFragment,
             dependentFragments,
             ktDiagnosticReporter
         ).collect()
 
-        //   2. Remove expect declarations since they are not needed anymore and should not be presented in the final IrFragment
-        //      It doesn't relate to unactualized expect declarations marked with @OptionalExpectation
+        //   2. Remove top-only expect declarations since they are not needed anymore and should not be presented in the final IrFragment
+        //      Expect fake-overrides from non-expect classes remain untouched since they will be actualized in the next phase.
+        //      Also, it doesn't remove unactualized expect declarations marked with @OptionalExpectation
         val removedExpectDeclarations = removeExpectDeclarations(dependentFragments, expectActualMap)
 
         //   3. Actualize expect fake overrides in non-expect classes inside common or multi-platform module.
@@ -43,7 +44,6 @@ object IrActualizer {
         //      taken from these non-expect classes actualized super classes.
         ActualFakeOverridesAdder(
             expectActualMap,
-            expectActualTypeAliasMap,
             ktDiagnosticReporter
         ).apply { dependentFragments.forEach { visitModuleFragment(it) } }
 

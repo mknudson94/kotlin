@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.ir.types.classifierOrFail
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
-import org.jetbrains.kotlin.name.FqName
 
 /**
  * It adds fake overrides to non-expect classes inside common or multi-platform module,
@@ -28,7 +27,6 @@ import org.jetbrains.kotlin.name.FqName
  */
 internal class ActualFakeOverridesAdder(
     private val expectActualMap: Map<IrSymbol, IrSymbol>,
-    private val typeAliasMap: Map<FqName, FqName>,
     private val diagnosticsReporter: KtDiagnosticReporterWithImplicitIrBasedContext
 ) : IrElementVisitorVoid {
     private val missingActualMembersMap = mutableMapOf<IrClass, MutableMap<String, MutableList<IrDeclaration>>>()
@@ -73,13 +71,13 @@ internal class ActualFakeOverridesAdder(
     ) {
         for (memberFromSupertype in membersFromSupertype.flatMap { it.value }) {
             val newMember = createFakeOverrideMember(listOf(memberFromSupertype), klass)
-            val mainSignature = generateIrElementFullNameFromExpect(newMember, typeAliasMap)
-            if (getMatches(mainSignature, newMember, expectActualMap).isEmpty()) {
-                processedMembers.getOrPut(mainSignature) { mutableListOf() }.add(memberFromSupertype)
-                getOrPut(mainSignature) { mutableListOf() }.add(newMember)
+            val signature = newMember.createMemberSignature()
+            if (getMatches(signature, newMember, expectActualMap).isEmpty()) {
+                processedMembers.addMember(memberFromSupertype as IrOverridableDeclaration<*>)
+                addMember(newMember)
                 klass.addMember(newMember)
             } else {
-                val baseMembers = processedMembers.getMatches(mainSignature, newMember, expectActualMap)
+                val baseMembers = processedMembers.getMatches(signature, newMember, expectActualMap)
                 val errorFactory =
                     if (baseMembers.all { (it.parent as IrClass).isInterface } && (memberFromSupertype.parent as IrClass).isInterface)
                         CommonBackendErrors.MANY_INTERFACES_MEMBER_NOT_IMPLEMENTED
@@ -107,9 +105,16 @@ internal class ActualFakeOverridesAdder(
                 (actualMember as? IrDeclarationWithVisibility)?.visibility != DescriptorVisibilities.PRIVATE &&
                 !actualWithCorrespondingExpectMembers.contains(actualMember.symbol)
             ) {
-                getOrPut(generateIrElementFullNameFromExpect(actualMember, typeAliasMap)) { mutableListOf() }
-                    .add(actualMember)
+                addMember(actualMember)
             }
         }
+    }
+
+    private fun MutableMap<String, MutableList<IrDeclaration>>.addMember(member: IrOverridableDeclaration<*>) {
+        getOrPut(member.createMemberSignature()) { mutableListOf() }.add(member)
+    }
+
+    private fun IrOverridableDeclaration<*>.createMemberSignature(): String {
+        return (this as IrDeclarationWithName).name.asString() + (if (this is IrSimpleFunction) "()" else "")
     }
 }

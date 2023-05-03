@@ -207,7 +207,7 @@ internal fun IrElement.containsOptionalExpectation(): Boolean {
 }
 
 @Suppress("UNCHECKED_CAST")
-internal fun createFakeOverrideMember(actualMembers: List<IrDeclaration>, declaration: IrClass): IrDeclaration {
+internal fun createFakeOverrideMember(actualMembers: List<IrDeclaration>, declaration: IrClass): IrOverridableDeclaration<*> {
     return when (actualMembers.first()) {
         is IrSimpleFunction -> createFakeOverrideFunction(actualMembers as List<IrSimpleFunction>, declaration)
         is IrProperty -> createFakeOverrideProperty(actualMembers as List<IrProperty>, declaration)
