@@ -94,8 +94,6 @@ abstract class DefaultKotlinBasePlugin : KotlinBasePlugin {
         }
 
         BuildMetricsService.registerIfAbsent(project)
-
-        project.warnExperimentalTryK2IsEnabled()
     }
 
     private fun addKotlinCompilerConfiguration(project: Project) {
@@ -260,6 +258,7 @@ abstract class KotlinBasePluginWrapper : DefaultKotlinBasePlugin() {
         tasks.withType(UsesKotlinToolingDiagnostics::class.java).configureEach {
             it.usesService(kotlinToolingDiagnosticsCollectorProvider)
             it.toolingDiagnosticsCollector.value(kotlinToolingDiagnosticsCollectorProvider)
+            it.diagnosticRenderingOptions.set(ToolingDiagnosticRenderingOptions.forProject(this))
         }
 
         launchInStage(KotlinPluginLifecycle.Stage.ReadyForExecution) {
