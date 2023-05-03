@@ -86,6 +86,12 @@ FILE: smartcastToStarProjectedType.kt
 
         public final fun copy(description: R|kotlin/String| = this@R|/NodePropertyDescriptor|.R|/NodePropertyDescriptor.description|, propertyRef: R|NodePropertyRef<TNode, TProperty, TPropertyVal>| = this@R|/NodePropertyDescriptor|.R|/NodePropertyDescriptor.propertyRef|): R|NodePropertyDescriptor<TNode, TProperty, TPropertyVal>|
 
+        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+
+        public final fun hashCode(): R|kotlin/Int|
+
+        public final fun toString(): R|kotlin/String|
+
     }
     public final class NodePropertyRef<T, U, V> : R|kotlin/Any| {
         public constructor<T, U, V>(): R|NodePropertyRef<T, U, V>| {

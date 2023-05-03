@@ -20,6 +20,12 @@ FILE: returnFromDelegatedConstuctor.kt
 
         public final fun copy(a: R|kotlin/String| = this@R|/StringPair|.R|/StringPair.a|, b: R|kotlin/String| = this@R|/StringPair|.R|/StringPair.b|): R|StringPair|
 
+        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+
+        public final fun hashCode(): R|kotlin/Int|
+
+        public final fun toString(): R|kotlin/String|
+
     }
     public abstract class Abs : R|kotlin/Any| {
         public constructor(a: R|kotlin/String|): R|Abs| {

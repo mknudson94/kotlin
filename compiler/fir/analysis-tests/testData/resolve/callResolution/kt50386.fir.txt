@@ -43,6 +43,12 @@ FILE: kt50386.kt
 
         public final fun copy(model: R|M| = this@R|/PresentedData|.R|/PresentedData.model|, events: R|E| = this@R|/PresentedData|.R|/PresentedData.events|): R|PresentedData<M, E>|
 
+        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+
+        public final fun hashCode(): R|kotlin/Int|
+
+        public final fun toString(): R|kotlin/String|
+
     }
     private final class ScrapingOffPresenter : R|Presenter<Flow<ScrapingOffEvent>, ScrapingOffModel, ScrapingOffOutput>| {
         public constructor(): R|ScrapingOffPresenter| {
