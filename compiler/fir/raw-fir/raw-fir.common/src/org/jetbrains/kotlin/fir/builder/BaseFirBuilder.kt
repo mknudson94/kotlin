@@ -876,7 +876,6 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     }
                     symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, name))
                     dispatchReceiverType = currentDispatchReceiverType()
-                    returnTypeRef = firProperty.returnTypeRef
                     // Refer to FIR backend ClassMemberGenerator for body generation.
                 }
                 classBuilder.addDeclaration(componentFunction)
