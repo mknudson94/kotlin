@@ -5,7 +5,9 @@
 
 package org.jetbrains.kotlin.fir.scopes.impl
 
+import org.jetbrains.kotlin.KtFakeSourceElementKind
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.utils.isFinal
 import org.jetbrains.kotlin.fir.declarations.utils.isStatic
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.scopes.*
@@ -14,6 +16,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.ConeSimpleKotlinType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
 abstract class AbstractFirUseSiteMemberScope(
     val classId: ClassId,
@@ -74,6 +77,22 @@ abstract class AbstractFirUseSiteMemberScope(
             if (symbol.isStatic) return@processFunctionsByName
             if (!symbol.isVisibleInCurrentClass()) return@processFunctionsByName
             val directOverridden = computeDirectOverriddenForDeclaredFunction(symbol)
+            if (symbol.source?.kind == KtFakeSourceElementKind.DataClassGeneratedMembers && name in ANY_MEMBER_NAMES) {
+                if (directOverridden.any { it.chosenSymbol.isFinal }) {
+                    return@processFunctionsByName
+                }
+                if (destination.isNotEmpty()) {
+                    val hasMatchingRealMember = when (name) {
+                        OperatorNameConventions.HASH_CODE, OperatorNameConventions.TO_STRING ->
+                            destination.any { it.valueParameterSymbols.isEmpty() && !it.isExtension && it.fir.contextReceivers.isEmpty() }
+                        else ->
+                            destination.any { it.fir.isEquals() }
+                    }
+                    if (hasMatchingRealMember) {
+                        return@processFunctionsByName
+                    }
+                }
+            }
             directOverriddenFunctions[symbol] = directOverridden
             destination += symbol
         }
@@ -224,5 +243,11 @@ abstract class AbstractFirUseSiteMemberScope(
 
     override fun getClassifierNames(): Set<Name> {
         return classifierNamesCached
+    }
+
+    companion object {
+        private val ANY_MEMBER_NAMES = hashSetOf(
+            OperatorNameConventions.HASH_CODE, OperatorNameConventions.EQUALS, OperatorNameConventions.TO_STRING
+        )
     }
 }
