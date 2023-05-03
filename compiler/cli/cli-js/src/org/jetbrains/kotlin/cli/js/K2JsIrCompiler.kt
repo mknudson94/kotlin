@@ -509,15 +509,18 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
         // FIR2IR
         val fir2IrActualizedResult = transformFirToIr(moduleStructure, outputs, diagnosticsReporter)
 
-        if (configuration.getBoolean(CommonConfigurationKeys.INCREMENTAL_COMPILATION)) {
-            if (shouldGoToNextIcRound(moduleStructure, outputs, fir2IrActualizedResult)) {
-                throw IncrementalNextRoundException()
-            }
-        }
-
         val messageCollector = configuration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
-        if (reportCompilationErrors(moduleStructure, ktFiles, diagnosticsReporter, messageCollector)) {
-            throw CompilationErrorException()
+
+        when (val icNextRoundStatus = shouldGoToNextIcRound(moduleStructure, outputs, fir2IrActualizedResult)) {
+            is IcNextRoundStatus.GoNextRound -> throw IncrementalNextRoundException()
+            is IcNextRoundStatus.ContinueCompilation -> {
+                if (reportCompilationErrors(moduleStructure, ktFiles, diagnosticsReporter, messageCollector)) {
+                    throw CompilationErrorException()
+                }
+                if (icNextRoundStatus.serializerException != null) {
+                    throw icNextRoundStatus.serializerException
+                }
+            }
         }
 
         // Serialize klib

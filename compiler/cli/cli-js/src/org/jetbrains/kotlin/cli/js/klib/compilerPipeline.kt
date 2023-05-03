@@ -233,22 +233,44 @@ fun serializeFirKlib(
     )
 }
 
+sealed class IcNextRoundStatus {
+    data object GoNextRound : IcNextRoundStatus()
+    class ContinueCompilation(val serializerException: Exception? = null) : IcNextRoundStatus()
+}
+
 fun shouldGoToNextIcRound(
     moduleStructure: ModulesStructure,
     firOutputs: List<ModuleCompilerAnalyzedOutput>,
     fir2IrActualizedResult: Fir2IrActualizedResult
-): Boolean {
-    val nextRoundChecker = moduleStructure.compilerConfiguration.get(JSConfigurationKeys.INCREMENTAL_NEXT_ROUND_CHECKER) ?: return false
+): IcNextRoundStatus {
+    val icEnabled = moduleStructure.compilerConfiguration.getBoolean(CommonConfigurationKeys.INCREMENTAL_COMPILATION)
+    val nextRoundChecker = moduleStructure.compilerConfiguration.get(JSConfigurationKeys.INCREMENTAL_NEXT_ROUND_CHECKER)
+    if (!icEnabled || nextRoundChecker == null) {
+        return IcNextRoundStatus.ContinueCompilation()
+    }
 
     val fir2KlibSerializer = Fir2KlibSerializer(moduleStructure, firOutputs, fir2IrActualizedResult)
 
+    var serializerException: Exception? = null
     for (ktFile in fir2KlibSerializer.sourceFiles) {
-        val packageFragment = fir2KlibSerializer.serializeSingleFirFile(ktFile)
+        val packageFragment = try {
+            // TODO: The serializer may throw an exception, for example, during annotation serialization
+            //  when it cannot find the removed constant (see ConstantValueUtils.kt:convertToConstantValues())
+            //  test example:  IncrementalJsKlibCompilerWithScopeExpansionRunnerTestGenerated.testFileWithConstantRemoved
+            //  Should we fix the serializer and remove try/catch wrap?
+            fir2KlibSerializer.serializeSingleFirFile(ktFile)
+        } catch (ex: Exception) {
+            serializerException = ex
+            continue
+        }
 
         // to minimize a number of IC rounds, we should inspect all proto for changes first,
         // then go to a next round if needed, with all new dirty files
         nextRoundChecker.checkProtoChanges(File(ktFile.path!!), packageFragment.toByteArray())
     }
 
-    return nextRoundChecker.shouldGoToNextRound()
+    if (nextRoundChecker.shouldGoToNextRound()) {
+        return IcNextRoundStatus.GoNextRound
+    }
+    return IcNextRoundStatus.ContinueCompilation(serializerException)
 }
