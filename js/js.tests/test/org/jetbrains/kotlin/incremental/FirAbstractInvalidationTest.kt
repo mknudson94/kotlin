@@ -8,9 +8,9 @@ package org.jetbrains.kotlin.incremental
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.js.klib.compileModuleToAnalyzedFir
+import org.jetbrains.kotlin.cli.js.klib.reportCompilationErrors
 import org.jetbrains.kotlin.cli.js.klib.serializeFirKlib
 import org.jetbrains.kotlin.cli.js.klib.transformFirToIr
-import org.jetbrains.kotlin.codegen.ProjectInfo
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporterFactory
 import org.jetbrains.kotlin.ir.backend.js.MainModule
@@ -69,29 +69,31 @@ abstract class FirAbstractInvalidationTest(
             ktFiles = sourceFiles,
             libraries = libraries,
             friendLibraries = friendLibraries,
-            messageCollector = messageCollector,
             diagnosticsReporter = diagnosticsReporter,
             incrementalDataProvider = null,
             lookupTracker = null,
         )
 
-        if (outputs != null) {
-            val fir2IrActualizedResult = transformFirToIr(moduleStructure, outputs, diagnosticsReporter)
+        val fir2IrActualizedResult = transformFirToIr(moduleStructure, outputs, diagnosticsReporter)
 
-            serializeFirKlib(
-                moduleStructure = moduleStructure,
-                firOutputs = outputs,
-                fir2IrActualizedResult = fir2IrActualizedResult,
-                outputKlibPath = outputKlibFile.absolutePath,
-                messageCollector = messageCollector,
-                diagnosticsReporter = diagnosticsReporter,
-                jsOutputName = moduleName
-            )
+        if (reportCompilationErrors(moduleStructure, sourceFiles, diagnosticsReporter, messageCollector)) {
+            val messages = outputStream.toByteArray().toString(Charset.forName("UTF-8"))
+            throw AssertionError("The following errors occurred compiling test:\n$messages")
         }
+
+        serializeFirKlib(
+            moduleStructure = moduleStructure,
+            firOutputs = outputs,
+            fir2IrActualizedResult = fir2IrActualizedResult,
+            outputKlibPath = outputKlibFile.absolutePath,
+            messageCollector = messageCollector,
+            diagnosticsReporter = diagnosticsReporter,
+            jsOutputName = moduleName
+        )
 
         if (messageCollector.hasErrors()) {
             val messages = outputStream.toByteArray().toString(Charset.forName("UTF-8"))
-            throw AssertionError("The following errors occurred compiling test:\n$messages")
+            throw AssertionError("The following errors occurred serializing test klib:\n$messages")
         }
     }
 }

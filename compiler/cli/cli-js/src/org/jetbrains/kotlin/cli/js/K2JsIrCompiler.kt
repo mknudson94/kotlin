@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.cli.js
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.text.StringUtil
+import org.jetbrains.kotlin.analyzer.CompilationErrorException
 import org.jetbrains.kotlin.backend.common.CompilationException
 import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
 import org.jetbrains.kotlin.backend.wasm.compileToLoweredIr
@@ -484,9 +485,8 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
         friendLibraries: List<String>,
         arguments: K2JSCompilerArguments,
         outputKlibPath: String
-    ): ModulesStructure? {
+    ): ModulesStructure {
         val configuration = environmentForJS.configuration
-        val messageCollector = configuration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
         val diagnosticsReporter = DiagnosticReporterFactory.createPendingReporter()
 
         val mainModule = MainModule.SourceFiles(environmentForJS.getSourceFiles())
@@ -494,24 +494,30 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
 
         val lookupTracker = configuration.get(CommonConfigurationKeys.LOOKUP_TRACKER) ?: LookupTracker.DO_NOTHING
 
+        val ktFiles = environmentForJS.getSourceFiles()
+
         val outputs = compileModuleToAnalyzedFir(
             moduleStructure = moduleStructure,
-            ktFiles = environmentForJS.getSourceFiles(),
+            ktFiles = ktFiles,
             libraries = libraries,
             friendLibraries = friendLibraries,
-            messageCollector = messageCollector,
             diagnosticsReporter = diagnosticsReporter,
             incrementalDataProvider = configuration[JSConfigurationKeys.INCREMENTAL_DATA_PROVIDER],
             lookupTracker = lookupTracker,
-        ) ?: return null
+        )
 
         // FIR2IR
         val fir2IrActualizedResult = transformFirToIr(moduleStructure, outputs, diagnosticsReporter)
 
         if (configuration.getBoolean(CommonConfigurationKeys.INCREMENTAL_COMPILATION)) {
-            if (shouldGoToNextIcRound(moduleStructure, outputs, fir2IrActualizedResult, configuration)) {
+            if (shouldGoToNextIcRound(moduleStructure, outputs, fir2IrActualizedResult)) {
                 throw IncrementalNextRoundException()
             }
+        }
+
+        val messageCollector = configuration.getNotNull(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
+        if (reportCompilationErrors(moduleStructure, ktFiles, diagnosticsReporter, messageCollector)) {
+            throw CompilationErrorException()
         }
 
         // Serialize klib

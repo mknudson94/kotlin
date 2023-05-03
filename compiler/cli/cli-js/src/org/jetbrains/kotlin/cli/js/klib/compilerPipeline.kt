@@ -57,22 +57,15 @@ fun compileModuleToAnalyzedFir(
     ktFiles: List<KtFile>,
     libraries: List<String>,
     friendLibraries: List<String>,
-    messageCollector: MessageCollector,
     diagnosticsReporter: BaseDiagnosticsCollector,
     incrementalDataProvider: IncrementalDataProvider?,
     lookupTracker: LookupTracker?,
-): List<ModuleCompilerAnalyzedOutput>? {
-    val renderDiagnosticNames = moduleStructure.compilerConfiguration.getBoolean(CLIConfigurationKeys.RENDER_DIAGNOSTIC_INTERNAL_NAME)
-
+): List<ModuleCompilerAnalyzedOutput> {
     // FIR
     val extensionRegistrars = FirExtensionRegistrar.getInstances(moduleStructure.project)
 
     val mainModuleName = moduleStructure.compilerConfiguration.get(CommonConfigurationKeys.MODULE_NAME)!!
     val escapedMainModuleName = Name.special("<$mainModuleName>")
-
-    val syntaxErrors = ktFiles.fold(false) { errorsFound, ktFile ->
-        AnalyzerWithCompilerReport.reportSyntaxErrors(ktFile, messageCollector).isHasErrors or errorsFound
-    }
 
     val binaryModuleData = BinaryModuleData.initialize(escapedMainModuleName, JsPlatforms.defaultJsPlatform, JsPlatformAnalyzerServices)
     val dependencyList = DependencyListForCliModule.build(binaryModuleData) {
@@ -93,12 +86,26 @@ fun compileModuleToAnalyzedFir(
         buildResolveAndCheckFir(it.session, it.files, diagnosticsReporter)
     }
 
-    if (syntaxErrors || diagnosticsReporter.hasErrors) {
-        diagnosticsReporter.reportToMessageCollector(messageCollector, renderDiagnosticNames)
-        return null
+    return outputs
+}
+
+fun reportCompilationErrors(
+    moduleStructure: ModulesStructure,
+    ktFiles: List<KtFile>,
+    diagnosticsReporter: BaseDiagnosticsCollector,
+    messageCollector: MessageCollector
+): Boolean {
+    val syntaxErrors = ktFiles.fold(false) { errorsFound, ktFile ->
+        AnalyzerWithCompilerReport.reportSyntaxErrors(ktFile, messageCollector).isHasErrors or errorsFound
     }
 
-    return outputs
+    if (syntaxErrors || diagnosticsReporter.hasErrors) {
+        val renderDiagnosticNames = moduleStructure.compilerConfiguration.getBoolean(CLIConfigurationKeys.RENDER_DIAGNOSTIC_INTERNAL_NAME)
+        diagnosticsReporter.reportToMessageCollector(messageCollector, renderDiagnosticNames)
+        return true
+    }
+
+    return false
 }
 
 fun transformFirToIr(
@@ -229,10 +236,9 @@ fun serializeFirKlib(
 fun shouldGoToNextIcRound(
     moduleStructure: ModulesStructure,
     firOutputs: List<ModuleCompilerAnalyzedOutput>,
-    fir2IrActualizedResult: Fir2IrActualizedResult,
-    config: CompilerConfiguration,
+    fir2IrActualizedResult: Fir2IrActualizedResult
 ): Boolean {
-    val nextRoundChecker = config.get(JSConfigurationKeys.INCREMENTAL_NEXT_ROUND_CHECKER) ?: return false
+    val nextRoundChecker = moduleStructure.compilerConfiguration.get(JSConfigurationKeys.INCREMENTAL_NEXT_ROUND_CHECKER) ?: return false
 
     val fir2KlibSerializer = Fir2KlibSerializer(moduleStructure, firOutputs, fir2IrActualizedResult)
 
