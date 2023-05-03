@@ -851,10 +851,10 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
                     generateComponentFunctions()
                     generateCopyFunction()
                 }
-                generateEqualsFunction()
-                generateHashCodeFunction()
-                generateToStringFunction()
             }
+            generateEqualsFunction()
+            generateHashCodeFunction()
+            generateToStringFunction()
             // Refer to (IR utils or FIR backend) DataClassMembersGenerator for generating equals, hashCode, and toString
         }
 
