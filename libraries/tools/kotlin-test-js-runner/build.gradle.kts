@@ -1,4 +1,5 @@
 import com.github.gradle.node.yarn.task.YarnTask
+import org.jetbrains.kotlin.synthetic.canBePropertyAccessor
 
 description = "Simple Kotlin/JS tests runner with TeamCity reporter"
 
@@ -12,10 +13,20 @@ publish()
 val default = configurations.getByName(Dependency.DEFAULT_CONFIGURATION)
 default.extendsFrom(configurations.publishedRuntime.get())
 
+val cachedDependencies by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
 node {
     version.set(nodejsVersion)
     download.set(true)
     nodeProjectDir.set(projectDir)
+}
+
+dependencies {
+    cachedDependencies("org.nodejs:node:$nodejsVersion:win-x64@zip")
+    cachedDependencies("org.nodejs:node:$nodejsVersion:linux-x64@tar.gz")
 }
 
 tasks {

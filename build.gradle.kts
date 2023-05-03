@@ -961,6 +961,10 @@ tasks.register("resolveDependencies") {
         allprojects {
             configurations.findByName("compileClasspath")?.resolve()
             configurations.findByName("testCompileClasspath")?.resolve()
+            configurations.findByName("cachedDependencies")?.resolve()
+
+            configurations.detachedConfiguration()
+
             plugins.withId("java-base") {
                 val service = project.extensions.getByType<JavaToolchainService>()
                 val javaExtension = extensions.getByType<JavaPluginExtension>()
