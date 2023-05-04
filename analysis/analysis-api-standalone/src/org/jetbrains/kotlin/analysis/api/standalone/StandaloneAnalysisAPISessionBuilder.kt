@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.analysis.low.level.api.fir.api.services.FirSealedCla
 import org.jetbrains.kotlin.analysis.low.level.api.fir.project.structure.LLFirBuiltinsSessionFactory
 import org.jetbrains.kotlin.analysis.project.structure.KtModuleScopeProvider
 import org.jetbrains.kotlin.analysis.project.structure.KtModuleScopeProviderImpl
-import org.jetbrains.kotlin.analysis.project.structure.ProjectStructureProvider
 import org.jetbrains.kotlin.analysis.project.structure.builder.KtModuleProviderBuilder
 import org.jetbrains.kotlin.analysis.project.structure.builder.buildProjectStructureProvider
 import org.jetbrains.kotlin.analysis.project.structure.impl.KtModuleProviderImpl
@@ -52,6 +51,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import org.jetbrains.kotlin.analysis.api.standalone.base.project.structure.KtStaticProjectStructureProvider
 
 public class StandaloneAnalysisAPISessionBuilder(
     applicationDisposable: Disposable,
@@ -76,7 +76,7 @@ public class StandaloneAnalysisAPISessionBuilder(
 
     public val project: Project = kotlinCoreProjectEnvironment.project
 
-    private lateinit var projectStructureProvider: ProjectStructureProvider
+    private lateinit var projectStructureProvider: KtStaticProjectStructureProvider
 
     public fun buildKtModuleProvider(init: KtModuleProviderBuilder.() -> Unit) {
         projectStructureProvider = buildProjectStructureProvider(init)
@@ -197,19 +197,17 @@ public class StandaloneAnalysisAPISessionBuilder(
     public fun build(
         withPsiDeclarationFromBinaryModuleProvider: Boolean = false,
     ): StandaloneAnalysisAPISession {
-        val ktModuleProviderImpl = projectStructureProvider as KtModuleProviderImpl
-        val modules = ktModuleProviderImpl.mainModules
-        val allSourceFiles = ktModuleProviderImpl.allSourceFiles()
         StandaloneProjectFactory.registerServicesForProjectEnvironment(
             kotlinCoreProjectEnvironment,
             projectStructureProvider,
-            modules,
-            allSourceFiles,
         )
 
         val project = kotlinCoreProjectEnvironment.project
-        val ktFiles = allSourceFiles.filterIsInstance<KtFile>()
-        val libraryRoots = StandaloneProjectFactory.getAllBinaryRoots(modules, kotlinCoreProjectEnvironment)
+        val ktFiles = projectStructureProvider.allSourceFiles.filterIsInstance<KtFile>()
+        val libraryRoots = StandaloneProjectFactory.getAllBinaryRoots(
+            projectStructureProvider.allKtModules,
+            kotlinCoreProjectEnvironment,
+        )
         val createPackagePartProvider =
             StandaloneProjectFactory.createPackagePartsProvider(
                 project,
