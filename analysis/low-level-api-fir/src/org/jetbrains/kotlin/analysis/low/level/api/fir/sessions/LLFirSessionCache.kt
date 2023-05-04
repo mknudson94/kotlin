@@ -48,9 +48,14 @@ import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.jvm.modules.JavaModuleResolver
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatformAnalyzerServices
+import org.jetbrains.kotlin.scripting.compiler.plugin.FirScriptingCompilerExtensionIdeaRegistrar
+import org.jetbrains.kotlin.scripting.compiler.plugin.impl.FirScriptingSamWithReceiverExtensionRegistrar
+import org.jetbrains.kotlin.scripting.definitions.findScriptDefinition
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.partitionIsInstance
 import java.util.concurrent.ConcurrentMap
+import kotlin.script.experimental.host.ScriptingHostConfiguration
+import kotlin.script.experimental.jvm.defaultJvmScriptingHostConfiguration
 
 @OptIn(PrivateSessionConstructor::class, SessionConfiguration::class)
 internal class LLFirSessionCache(private val project: Project) {
@@ -350,6 +355,25 @@ internal class LLFirSessionCache(private val project: Project) {
             registerCommonJavaComponents(JavaModuleResolver.getInstance(project))
             registerResolveComponents()
             registerJavaSpecificResolveComponents()
+
+            register(FirRegisteredPluginAnnotations::class, FirRegisteredPluginAnnotationsImpl(this))
+
+            FirSessionConfigurator(this).apply {
+
+                val hostConfiguration = ScriptingHostConfiguration(defaultJvmScriptingHostConfiguration) {
+                    // TODO: add jdk path and other params if needed
+                }
+
+                val scriptDefinition = module.file.findScriptDefinition()!!
+
+                registerExtensions((FirScriptingCompilerExtensionIdeaRegistrar(
+                        hostConfiguration, scriptDefinitionSources = emptyList(), scriptDefinitions = listOf(scriptDefinition)
+                    ) as FirExtensionRegistrar).configure()
+                )
+
+                registerExtensions((FirScriptingSamWithReceiverExtensionRegistrar() as FirExtensionRegistrar).configure())
+
+            }.configure()
 
             val provider = LLFirProvider(
                 this,

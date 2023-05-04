@@ -139,7 +139,7 @@ internal class ScriptingSamWithReceiverComponentContributor(val annotations: Lis
     }
 }
 
-internal class FirScriptingSamWithReceiverExtensionRegistrar() : FirExtensionRegistrar() {
+class FirScriptingSamWithReceiverExtensionRegistrar() : FirExtensionRegistrar() {
     override fun ExtensionRegistrarContext.configurePlugin() {
         +::FirScriptSamWithReceiverConventionTransformer
     }
