@@ -48,7 +48,7 @@ class SealedClassesInheritorsCaclulatorPreAnalysisHandler(
         for ((testModule, ktFiles) in ktFilesByModule) {
             if (ktFiles.isEmpty()) continue
             val project = testServices.compilerConfigurationProvider.getProject(testModule)
-            val ktModuleProvider = project.getService(ProjectStructureProvider::class.java)
+            val ktModuleProvider = ProjectStructureProvider.getInstance(project)
             val ktModule = ktFiles.map(ktModuleProvider::getKtModuleForKtElement).distinct().single()
 
             val tmpFirResolveSession = LLFirResolveSessionService.getInstance(project).getFirResolveSessionNoCaching(ktModule)

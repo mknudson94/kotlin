@@ -40,7 +40,7 @@ abstract class LLFirSelectingCombinedSymbolProvider<PROVIDER : FirSymbolProvider
     /**
      * Cache [ProjectStructureProvider] to avoid service access when getting [KtModule]s.
      */
-    private val projectStructureProvider: ProjectStructureProvider = project.getService(ProjectStructureProvider::class.java)
+    private val projectStructureProvider: ProjectStructureProvider = ProjectStructureProvider.getInstance(project)
 
     /**
      * Selects the element with the highest module precedence in [candidates], returning the element and the provider to which resolution

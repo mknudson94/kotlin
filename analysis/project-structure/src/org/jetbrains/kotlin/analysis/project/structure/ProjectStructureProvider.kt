@@ -13,6 +13,10 @@ public abstract class ProjectStructureProvider {
      * For a given [PsiElement] get a [KtModule] to which [PsiElement] belongs.
      */
     public abstract fun getKtModuleForKtElement(element: PsiElement): KtModule
+
+    companion object {
+        fun getInstance(project: Project): ProjectStructureProvider = project.getService(ProjectStructureProvider::class.java)
+    }
 }
 
 /**
@@ -20,8 +24,7 @@ public abstract class ProjectStructureProvider {
  * @param project [Project] which contains current [PsiElement]. `PsiElement.project` may be a heavy operation as it includes PSI tree traversal. So, when a [Project] is  already available, it is better to pass it explicitly
  */
 public fun PsiElement.getKtModule(project: Project = this.project): KtModule =
-    project.getService(ProjectStructureProvider::class.java)
-        .getKtModuleForKtElement(this)
+    ProjectStructureProvider.getInstance(project).getKtModuleForKtElement(this)
 
 /**
  * For a given [PsiElement] get a [KtModule] to which [PsiElement] belongs.
