@@ -613,6 +613,17 @@ fun Project.configureDokkaPublication(
     shouldLinkGradleApi: Boolean = false,
     configurePublishingToKotlinlang: Boolean = false,
 ) {
+
+    val cachedDependencies by configurations.creating {
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+
+    dependencies {
+        cachedDependencies("org.jetbrains.dokka:javadoc-plugin:${DokkaVersion.version}")
+        cachedDependencies("org.jetbrains.dokka:versioning-plugin:1.8.10")
+    }
+
     if (!kotlinBuildProperties.publishGradlePluginsJavadoc) return
 
     plugins.apply("org.jetbrains.dokka")
