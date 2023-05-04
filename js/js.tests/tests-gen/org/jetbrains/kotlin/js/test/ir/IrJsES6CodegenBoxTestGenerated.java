@@ -12690,6 +12690,12 @@ public class IrJsES6CodegenBoxTestGenerated extends AbstractIrJsES6CodegenBoxTes
         }
 
         @Test
+        @TestMetadata("enumEntriesHiding.kt")
+        public void testEnumEntriesHiding() throws Exception {
+            runTest("compiler/testData/codegen/box/enum/enumEntriesHiding.kt");
+        }
+
+        @Test
         @TestMetadata("enumEntriesInCompanion.kt")
         public void testEnumEntriesInCompanion() throws Exception {
             runTest("compiler/testData/codegen/box/enum/enumEntriesInCompanion.kt");
