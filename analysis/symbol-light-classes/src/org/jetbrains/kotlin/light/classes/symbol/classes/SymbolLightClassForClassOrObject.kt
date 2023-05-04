@@ -24,13 +24,13 @@ import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.builtins.StandardNames.HASHCODE_NAME
 import org.jetbrains.kotlin.config.LanguageFeature
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.light.classes.symbol.annotations.GranularAnnotationsBox
 import org.jetbrains.kotlin.light.classes.symbol.annotations.SymbolAnnotationsProvider
 import org.jetbrains.kotlin.light.classes.symbol.cachedValue
 import org.jetbrains.kotlin.light.classes.symbol.fields.SymbolLightFieldForEnumEntry
 import org.jetbrains.kotlin.light.classes.symbol.fields.SymbolLightFieldForObject
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightSimpleMethod
+import org.jetbrains.kotlin.light.classes.symbol.methods.isFromAny
 import org.jetbrains.kotlin.light.classes.symbol.modifierLists.GranularModifiersBox
 import org.jetbrains.kotlin.light.classes.symbol.modifierLists.SymbolLightClassModifierList
 import org.jetbrains.kotlin.load.java.JvmAbi
@@ -196,23 +196,18 @@ internal open class SymbolLightClassForClassOrObject : SymbolLightClassForNamedC
 
         // Compiler will generate 'equals/hashCode/toString' for data class if they are not final.
         // We want to mimic that.
-        val nonFinalFunctionsFromAny = classOrObjectSymbol.getMemberScope()
+        val generatedFunctionsFromAny = classOrObjectSymbol.getMemberScope()
             .getCallableSymbols { name -> name.isFromAny }
             .filterIsInstance<KtFunctionSymbol>()
-            .filterNot {
-                it.modality == Modality.FINAL || (it.getContainingSymbol() as? KtNamedClassOrObjectSymbol)?.modality == Modality.FINAL
-            }.filter { actuallyComesFromAny(it) }
+            .filter { it.origin == KtSymbolOrigin.SOURCE_MEMBER_GENERATED }
 
-        val functionsFromAnyByName = nonFinalFunctionsFromAny.associateBy { it.name }
+        val functionsFromAnyByName = generatedFunctionsFromAny.associateBy { it.name }
 
         // NB: functions from `Any` are not in an alphabetic order.
         functionsFromAnyByName[TO_STRING]?.let { createMethodFromAny(it) }
         functionsFromAnyByName[HASHCODE_NAME]?.let { createMethodFromAny(it) }
         functionsFromAnyByName[EQUALS]?.let { createMethodFromAny(it) }
     }
-
-    private val Name.isFromAny: Boolean
-        get() = this == EQUALS || this == HASHCODE_NAME || this == TO_STRING
 
     context(KtAnalysisSession)
     private fun addDelegatesToInterfaceMethods(result: MutableList<KtLightMethod>, classOrObjectSymbol: KtNamedClassOrObjectSymbol) {

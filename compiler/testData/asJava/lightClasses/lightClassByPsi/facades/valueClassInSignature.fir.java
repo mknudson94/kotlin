@@ -6,7 +6,14 @@ public final class Some /* Some*/ {
   @org.jetbrains.annotations.NotNull()
   public final java.lang.String getValue();//  getValue()
 
+  @org.jetbrains.annotations.NotNull()
+  public final java.lang.String toString();//  toString()
+
   public  Some(@org.jetbrains.annotations.NotNull() java.lang.String);//  .ctor(java.lang.String)
+
+  public final boolean equals(@org.jetbrains.annotations.Nullable() java.lang.Object);//  equals(java.lang.Object)
+
+  public final int hashCode();//  hashCode()
 }
 
 public final class SomeClass /* SomeClass*/ {
