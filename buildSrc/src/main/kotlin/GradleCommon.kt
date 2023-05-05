@@ -505,12 +505,11 @@ private fun Project.commonVariantAttributes(): Action<Configuration> = Action<Co
 fun Project.configureKotlinCompileTasksGradleCompatibility() {
     @Suppress("DEPRECATION")
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions.languageVersion = "1.4"
+        kotlinOptions.languageVersion = "1.5"
         kotlinOptions.apiVersion = "1.4"
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xskip-prerelease-check",
             "-Xsuppress-version-warnings",
-            "-Xuse-ir" // Needed as long as languageVersion is less than 1.5.
         )
     }
 }

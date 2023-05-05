@@ -3,6 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 import com.gradle.publish.PluginBundleExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import plugins.signLibraryPublication
 
 plugins {
@@ -45,6 +46,12 @@ publishing {
 tasks {
     named("install") {
         dependsOn(named("validatePlugins"))
+    }
+    tasks.withType<KotlinCompile>().configureEach {
+        // We have to override the default value for `-Xsam-conversions` to `class`
+        // otherwise the compiler would compile lambdas using invokedynamic,
+        // such lambdas are not serializable so are not compatible with Gradle configuration cache
+        compilerOptions.freeCompilerArgs.add("-Xsam-conversions=class")
     }
 }
 

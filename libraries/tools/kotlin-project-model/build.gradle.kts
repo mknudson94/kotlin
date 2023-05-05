@@ -26,7 +26,7 @@ projectTest(jUnitMode = JUnitMode.JUnit5) {
 
 tasks.withType<KotlinJvmCompile>().configureEach {
     kotlinOptions {
-        languageVersion = "1.4"
+        languageVersion = "1.5"
         apiVersion = "1.4"
         freeCompilerArgs += listOf("-Xskip-prerelease-check", "-Xsuppress-version-warnings")
     }

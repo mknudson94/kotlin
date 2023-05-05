@@ -17,9 +17,9 @@ sourceSets {
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            languageVersion = "1.4"
+            languageVersion = "1.5"
             apiVersion = "1.4"
-            freeCompilerArgs += listOf("-Xsuppress-version-warnings", "-Xinline-classes")
+            freeCompilerArgs += listOf("-Xsuppress-version-warnings")
         }
     }
 }
