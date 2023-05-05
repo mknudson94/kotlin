@@ -107,6 +107,7 @@ class Fir2IrVisitor(
 
     override fun visitFile(file: FirFile, data: Any?): IrFile {
         return conversionScope.withParent(declarationStorage.getIrFile(file)) {
+            declarationStorage.resetTemporaryVariableIndex()
             file.declarations.forEach {
                 it.toIrDeclaration()
             }

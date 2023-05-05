@@ -1220,6 +1220,10 @@ class Fir2IrDeclarationStorage(
         return if (nameHint != null) "tmp${index}_$nameHint" else "tmp$index"
     }
 
+    fun resetTemporaryVariableIndex() {
+        lastTemporaryIndex = 0
+    }
+
     private fun declareIrVariable(
         startOffset: Int, endOffset: Int,
         origin: IrDeclarationOrigin, name: Name, type: IrType,
