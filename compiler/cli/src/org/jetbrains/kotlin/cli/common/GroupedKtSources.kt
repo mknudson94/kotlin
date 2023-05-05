@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.idea.KotlinFileType
 import java.util.TreeSet
+import org.jetbrains.kotlin.psi.KtFile
 
 private const val kotlinFileExtensionWithDot = ".${KotlinFileType.EXTENSION}"
 private const val javaFileExtensionWithDot = ".${JavaFileType.DEFAULT_EXTENSION}"
@@ -87,4 +88,17 @@ fun collectSources(
         )
     }
     return GroupedKtSources(platformSources, commonSources, sourcesByModuleName)
+}
+
+fun Collection<KtSourceFile>.reorderBy(orderedSources: Collection<KtFile>): List<KtSourceFile> {
+    val indices = orderedSources.mapIndexed { index, ktFile -> ktFile.virtualFilePath to index }.toMap()
+    val result = MutableList<KtSourceFile?>(indices.size) { null }
+
+    for (it in this) {
+        val path = it.path ?: error("$it doesn't have a defined path")
+        val index = indices[path] ?: error("File $it isn't present in $orderedSources")
+        result[index] = it
+    }
+
+    return result.filterNotNull()
 }

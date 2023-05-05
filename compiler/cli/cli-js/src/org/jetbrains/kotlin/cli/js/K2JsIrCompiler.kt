@@ -500,7 +500,7 @@ class K2JsIrCompiler : CLICompiler<K2JSCompilerArguments>() {
             val ktSourceFiles = mutableListOf<KtSourceFile>().apply {
                 addAll(groupedSources.commonSources)
                 addAll(groupedSources.platformSources)
-            }
+            }.reorderBy(environmentForJS.getSourceFiles())
 
             compileModulesToAnalyzedFirWithLightTree(
                 moduleStructure = moduleStructure,
