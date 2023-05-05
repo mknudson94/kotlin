@@ -11,6 +11,12 @@ FILE: tryInGenerated.kt
 
         public final fun copy(t: R|D| = this@R|/Ref|.R|/Ref.t|): R|Ref<D>|
 
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+
+        public open fun hashCode(): R|kotlin/Int|
+
+        public open fun toString(): R|kotlin/String|
+
     }
     public final operator fun <V> R|Ref<V>|.getValue(hisRef: R|kotlin/Any?|, property: R|kotlin/reflect/KProperty<*>|): R|V| {
         ^getValue this@R|/getValue|.R|SubstitutionOverride</Ref.t: R|V|>|

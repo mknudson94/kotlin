@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.analysis.diagnostics.FirErrors
 import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirClass
 import org.jetbrains.kotlin.fir.declarations.FirConstructor
+import org.jetbrains.kotlin.fir.declarations.FirDeclarationOrigin
 import org.jetbrains.kotlin.fir.declarations.utils.isOpen
 import org.jetbrains.kotlin.fir.declarations.utils.isOverride
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -30,6 +31,7 @@ object FirOpenMemberChecker : FirClassChecker() {
                 memberDeclaration is FirConstructor
             ) continue
             val source = memberDeclaration.source ?: continue
+            if (source.kind is KtFakeSourceElementKind.DataClassGeneratedMembers) continue
             if (memberDeclaration.isOpen && !memberDeclaration.isOverride && declaration.classKind == ClassKind.ANNOTATION_CLASS ||
                 memberDeclaration.hasModifier(KtTokens.OPEN_KEYWORD) && source.shouldReportOpenFromSource
             ) {
