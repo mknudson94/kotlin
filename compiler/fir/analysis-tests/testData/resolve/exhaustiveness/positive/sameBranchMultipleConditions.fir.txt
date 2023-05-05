@@ -15,11 +15,11 @@ FILE: sameBranchMultipleConditions.kt
 
         public final fun copy(something: R|kotlin/String| = this@R|/X|.R|/X.something|): R|X|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final data class Y : R|A|, R|B| {
@@ -34,11 +34,11 @@ FILE: sameBranchMultipleConditions.kt
 
         public final fun copy(something: R|kotlin/String| = this@R|/Y|.R|/Y.something|): R|Y|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final fun ok(a: R|A|): R|B| {

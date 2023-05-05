@@ -5,11 +5,11 @@ public final data class DataClass : R|kotlin/Any| {
 
     public final fun copy(x: R|kotlin/String| = STUB, y: R|kotlin/Int| = STUB): R|test/DataClass|
 
-    public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+    public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-    public final fun hashCode(): R|kotlin/Int|
+    public open fun hashCode(): R|kotlin/Int|
 
-    public final fun toString(): R|kotlin/String|
+    public open fun toString(): R|kotlin/String|
 
     public final val x: R|kotlin/String|
         public get(): R|kotlin/String|

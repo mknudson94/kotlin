@@ -30,10 +30,10 @@ FILE: simpleClass.kt
             LAZY_super<R|kotlin/Any|>
         }
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }

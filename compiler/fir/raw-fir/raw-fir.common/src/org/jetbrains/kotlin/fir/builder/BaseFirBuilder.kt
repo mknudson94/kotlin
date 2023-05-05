@@ -945,7 +945,7 @@ abstract class BaseFirBuilder<T>(val baseSession: FirSession, val context: Conte
             moduleData = baseModuleData
             origin = FirDeclarationOrigin.Synthetic
             this.name = name
-            status = FirDeclarationStatusImpl(Visibilities.Public, Modality.FINAL).apply {
+            status = FirDeclarationStatusImpl(Visibilities.Public, Modality.OPEN).apply {
                 this.isOperator = isOperator
             }
             symbol = FirNamedFunctionSymbol(CallableId(packageFqName, classFqName, name))

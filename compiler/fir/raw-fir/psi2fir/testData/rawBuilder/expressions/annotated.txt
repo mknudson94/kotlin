@@ -37,11 +37,11 @@ FILE: annotated.kt
 
         public final fun copy(x: Int = this@R|/Two|.R|/Two.x|, y: Int = this@R|/Two|.R|/Two.y|): R|Two|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public? final? fun bar(two: Two): R|kotlin/Unit| {

@@ -29,11 +29,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/WithCompanion|.R|com/example/WithCompanion.i|): R|com/example/WithCompanion|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     @R|kotlinx/serialization/Serializable|(with = <getClass>(Q|com/example/WithNamedCompanion.Named|)) public final data class WithNamedCompanion : R|kotlin/Any| {
@@ -64,11 +64,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/WithNamedCompanion|.R|com/example/WithNamedCompanion.i|): R|com/example/WithNamedCompanion|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     @R|kotlinx/serialization/Serializable|(with = <getClass>(Q|com/example/WithExplicitType.Companion|)) public final data class WithExplicitType : R|kotlin/Any| {
@@ -99,11 +99,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/WithExplicitType|.R|com/example/WithExplicitType.i|): R|com/example/WithExplicitType|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     @R|kotlinx/serialization/Serializable|(with = <getClass>(Q|com/example/PartiallyOverridden.Companion|)) public final data class PartiallyOverridden : R|kotlin/Any| {
@@ -141,11 +141,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/PartiallyOverridden|.R|com/example/PartiallyOverridden.i|): R|com/example/PartiallyOverridden|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     @R|kotlinx/serialization/Serializable|(with = <getClass>(Q|com/example/PartiallyWithoutType.Companion|)) public final data class PartiallyWithoutType : R|kotlin/Any| {
@@ -196,11 +196,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/PartiallyWithoutType|.R|com/example/PartiallyWithoutType.i|): R|com/example/PartiallyWithoutType|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     @R|kotlinx/serialization/Serializable|(with = <getClass>(Q|com/example/FullyOverridden.Companion|)) public final data class FullyOverridden : R|kotlin/Any| {
@@ -236,11 +236,11 @@ FILE: serializerViaCompanion.kt
 
         public final fun copy(i: R|kotlin/Int| = this@R|com/example/FullyOverridden|.R|com/example/FullyOverridden.i|): R|com/example/FullyOverridden|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final fun box(): R|kotlin/String| {

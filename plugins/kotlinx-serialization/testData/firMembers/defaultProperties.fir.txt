@@ -24,11 +24,11 @@ FILE: defaultProperties.kt
 
         public final fun copy(ctor: R|kotlin/Int| = this@R|/SomeClass|.R|/SomeClass.ctor|, ctorDependent: R|kotlin/Int| = this@R|/SomeClass|.R|/SomeClass.ctorDependent|): R|SomeClass|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
         public final companion object Companion : R|kotlin/Any| {
             public final fun serializer(): R|kotlinx/serialization/KSerializer<SomeClass>|

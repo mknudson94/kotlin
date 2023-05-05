@@ -11,11 +11,11 @@ FILE: nullable2.kt
 
         public final fun copy(name: R|kotlin/String| = this@R|/Foo|.R|/Foo.name|): R|Foo|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final fun nullable2(foo: R|Foo?|): R|kotlin/Unit| {

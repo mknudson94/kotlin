@@ -12,11 +12,11 @@ FILE: inlineClassDeclaration.kt
             public final val x: R|kotlin/Int| = R|<local>/x|
                 public get(): R|kotlin/Int|
 
-            public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+            public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-            public final fun hashCode(): R|kotlin/Int|
+            public open fun hashCode(): R|kotlin/Int|
 
-            public final fun toString(): R|kotlin/String|
+            public open fun toString(): R|kotlin/String|
 
         }
 
@@ -29,11 +29,11 @@ FILE: inlineClassDeclaration.kt
                 public final val x: R|kotlin/Int| = R|<local>/x|
                     public get(): R|kotlin/Int|
 
-                public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+                public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-                public final fun hashCode(): R|kotlin/Int|
+                public open fun hashCode(): R|kotlin/Int|
 
-                public final fun toString(): R|kotlin/String|
+                public open fun toString(): R|kotlin/String|
 
             }
 
@@ -47,11 +47,11 @@ FILE: inlineClassDeclaration.kt
             public final val x: R|kotlin/Int| = R|<local>/x|
                 public get(): R|kotlin/Int|
 
-            public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+            public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-            public final fun hashCode(): R|kotlin/Int|
+            public open fun hashCode(): R|kotlin/Int|
 
-            public final fun toString(): R|kotlin/String|
+            public open fun toString(): R|kotlin/String|
 
         }
 
@@ -64,11 +64,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public abstract inline class NotFinalClass2 : R|kotlin/Any| {
@@ -79,11 +79,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public sealed inline class NotFinalClass3 : R|kotlin/Any| {
@@ -94,11 +94,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final inline class CloneableClass1 : R|kotlin/Cloneable| {
@@ -109,11 +109,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final inline class CloneableClass2 : R|java/lang/Cloneable| {
@@ -124,11 +124,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public open class Test : R|kotlin/Any| {
@@ -145,11 +145,11 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final inline class ImplementByDelegation : R|kotlin/Comparable<kotlin/Int>| {
@@ -162,10 +162,10 @@ FILE: inlineClassDeclaration.kt
         public final val x: R|kotlin/Int| = R|<local>/x|
             public get(): R|kotlin/Int|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }

@@ -17,11 +17,11 @@ FILE: kt53494.kt
 
         public final fun copy(value: R|T| = this@R|/Wrapped|.R|/Wrapped.value|): R|Wrapped<T>|
 
-        public final operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
+        public open operator fun equals(other: R|kotlin/Any?|): R|kotlin/Boolean|
 
-        public final fun hashCode(): R|kotlin/Int|
+        public open fun hashCode(): R|kotlin/Int|
 
-        public final fun toString(): R|kotlin/String|
+        public open fun toString(): R|kotlin/String|
 
     }
     public final object Default : R|C<kotlin/Nothing>| {
