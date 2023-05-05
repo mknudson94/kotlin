@@ -37,7 +37,7 @@ class FileSnapshotMap(
         val newOrModified = ArrayList<File>()
         val removed = ArrayList<File>()
 
-        val newPaths = newFiles.mapTo(HashSet(), transform = pathConverter::toPath)
+        val newPaths = newFiles.mapTo(LinkedHashSet(), transform = pathConverter::toPath)
         for (oldPath in storage.keys) {
             if (oldPath !in newPaths) {
                 storage.remove(oldPath)

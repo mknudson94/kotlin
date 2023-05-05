@@ -14,7 +14,7 @@ class DirtyFilesContainer(
     private val reporter: ICReporter,
     private val sourceFilesExtensions: List<String>
 ) {
-    private val myDirtyFiles = HashSet<File>()
+    private val myDirtyFiles = LinkedHashSet<File>()
 
     fun isEmpty() = myDirtyFiles.isEmpty()
 

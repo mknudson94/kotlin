@@ -215,7 +215,7 @@ fun mapLookupSymbolsToFiles(
     reporter: ICReporter,
     excludes: Set<File> = emptySet()
 ): Set<File> {
-    val dirtyFiles = HashSet<File>()
+    val dirtyFiles = LinkedHashSet<File>()
 
     for (lookup in lookupSymbols) {
         val affectedFiles = lookupStorage.get(lookup).map(::File).filter { it !in excludes }
@@ -232,7 +232,7 @@ fun mapClassesFqNamesToFiles(
     reporter: ICReporter,
     excludes: Set<File> = emptySet()
 ): Set<File> {
-    val fqNameToAffectedFiles = HashMap<FqName, MutableSet<File>>()
+    val fqNameToAffectedFiles = LinkedHashMap<FqName, MutableSet<File>>()
 
     for (cache in caches) {
         for (classFqName in classesFqNames) {
@@ -247,7 +247,7 @@ fun mapClassesFqNamesToFiles(
         reporter.reportMarkDirtyClass(affectedFiles, classFqName.asString())
     }
 
-    return fqNameToAffectedFiles.values.flattenTo(HashSet())
+    return fqNameToAffectedFiles.values.flattenTo(LinkedHashSet())
 }
 
 fun isSealed(
