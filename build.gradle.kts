@@ -169,11 +169,11 @@ val firCompilerCoreModules = arrayOf(
 ).also { extra["firCompilerCoreModules"] = it }
 
 val firAllCompilerModules = firCompilerCoreModules +
-    arrayOf(
-        ":compiler:fir:raw-fir:light-tree2fir",
-        ":compiler:fir:analysis-tests",
-        ":compiler:fir:analysis-tests:legacy-fir-tests"
-    )
+        arrayOf(
+            ":compiler:fir:raw-fir:light-tree2fir",
+            ":compiler:fir:analysis-tests",
+            ":compiler:fir:analysis-tests:legacy-fir-tests"
+        )
 
 val fe10CompilerModules = arrayOf(
     ":compiler",
@@ -957,6 +957,8 @@ afterEvaluate {
 }
 
 tasks.register("resolveDependencies") {
+    dependsOn(":kotlinYarnSetup")
+
     doFirst {
         allprojects {
             configurations.findByName("compileClasspath")?.resolve()
