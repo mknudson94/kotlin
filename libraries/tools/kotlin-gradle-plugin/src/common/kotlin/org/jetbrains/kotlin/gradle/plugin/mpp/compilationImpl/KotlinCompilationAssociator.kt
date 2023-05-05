@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.gradle.plugin.mpp.compilationImpl
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType.jvm
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.InternalKotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinWithJavaTarget
@@ -78,7 +79,8 @@ internal object KotlinJvmCompilationAssociator : KotlinCompilationAssociator {
     override fun associate(target: KotlinTarget, auxiliary: InternalKotlinCompilation<*>, main: InternalKotlinCompilation<*>) {
         /* Main to Test association handled already by java plugin */
         if (
-            (target is KotlinWithJavaTarget<*, *> || (target is KotlinJvmTarget && target.withJavaEnabled)) &&
+            ((target is KotlinWithJavaTarget<*, *> && target.platformType == jvm) ||
+                    (target is KotlinJvmTarget && target.withJavaEnabled)) &&
             auxiliary.isTest() && main.isMain()
         ) {
             return
