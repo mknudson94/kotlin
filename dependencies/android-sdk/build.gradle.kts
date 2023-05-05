@@ -126,6 +126,16 @@ fun unzipSdkTask(
     return unzipTask
 }
 
+val cachedDependencies by configurations.creating {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+}
+
+dependencies {
+    cachedDependencies("google:build-tools:r29.0.3:windows@zip")
+    cachedDependencies("google:build-tools:r29.0.3:linux@zip")
+}
+
 unzipSdkTask("platform", "26_r02", "platforms/android-26", "", androidPlatform, 1, prepareTask = preparePlatform)
 unzipSdkTask("android_m2repository", "r44", "extras/android", "")
 unzipSdkTask("platform-tools", "r28.0.1", "", toolsOsDarwin)
