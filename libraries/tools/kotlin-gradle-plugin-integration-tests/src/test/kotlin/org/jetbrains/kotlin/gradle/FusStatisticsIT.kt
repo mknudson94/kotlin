@@ -16,6 +16,7 @@ import java.nio.file.Path
 import kotlin.streams.asSequence
 
 @DisplayName("FUS statistic")
+@JvmGradlePluginTests
 class FusStatisticsIT : KGPBaseTest() {
     @DisplayName("for dokka")
     @GradleTest
@@ -40,25 +41,9 @@ class FusStatisticsIT : KGPBaseTest() {
             "plugins {",
             """
                     plugins {
-                        id("org.jetbrains.dokka") version "1.7.10"
+                        id("org.jetbrains.dokka") version "1.8.10"
                     """.trimIndent()
         )
-        buildGradle.modify {
-            """
-                        import org.jetbrains.dokka.DokkaConfiguration.Visibility
-                        import org.jetbrains.dokka.gradle.DokkaTask
-                        $it
-                        tasks.withType(DokkaTask.class) {
-                            dokkaSourceSets.configureEach {
-                                documentedVisibilities.set([
-                                        Visibility.PUBLIC,
-                                        Visibility.PROTECTED
-                                ])
-                            }
-                        }
-                    """.trimIndent()
-
-        }
     }
 
     private val GradleProject.fusStatisticsPath: Path
