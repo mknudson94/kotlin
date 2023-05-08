@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.analysis.project.structure.KtModule
 import org.jetbrains.kotlin.analysis.project.structure.KtSourceModule
 import org.jetbrains.kotlin.analysis.project.structure.getKtModuleOfTypeSafe
 import org.jetbrains.kotlin.analysis.utils.errors.requireIsInstance
+import org.jetbrains.kotlin.analysis.utils.printer.parentOfType
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.asJava.classes.*
 import org.jetbrains.kotlin.asJava.elements.KtLightField
@@ -41,7 +42,9 @@ import org.jetbrains.kotlin.light.classes.symbol.fields.SymbolLightField
 import org.jetbrains.kotlin.light.classes.symbol.fields.SymbolLightFieldForEnumEntry
 import org.jetbrains.kotlin.light.classes.symbol.fields.SymbolLightFieldForProperty
 import org.jetbrains.kotlin.light.classes.symbol.mapType
+import org.jetbrains.kotlin.light.classes.symbol.methods.*
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightAccessorMethod
+import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightAnnotationsMethod
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightConstructor
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightNoArgConstructor
 import org.jetbrains.kotlin.light.classes.symbol.methods.SymbolLightSimpleMethod
@@ -285,6 +288,26 @@ internal fun SymbolLightClassBase.createPropertyAccessors(
 
     if (declaration.getter?.hasBody != true && declaration.setter?.hasBody != true && declaration.visibility.isPrivateOrPrivateToThis()) return
 
+    val originalElement = declaration.sourcePsiSafe<KtDeclaration>()
+
+    if (!this@createPropertyAccessors.isAnnotationType && declaration.psi?.parentOfType<KtClassOrObject>() == this.kotlinOrigin) {
+        val lightMemberOrigin = originalElement?.let {
+            LightMemberOriginForDeclaration(
+                originalElement = it,
+                originKind = JvmDeclarationOriginKind.OTHER,
+            )
+        }
+        val method = SymbolLightAnnotationsMethod(
+            ktAnalysisSession = this@KtAnalysisSession,
+            containingPropertySymbol = declaration,
+            lightMemberOrigin = lightMemberOrigin,
+            containingClass = this@createPropertyAccessors
+        )
+        if (method.annotations.size > 1) { // There's always a @java.lang.Deprecated
+            result.add(method)
+        }
+    }
+
     if (declaration.isJvmField) return
     val propertyTypeIsValueClass = declaration.hasTypeForValueClassInSignature()
 
@@ -319,8 +342,6 @@ internal fun SymbolLightClassBase.createPropertyAccessors(
         if (declaration.isHiddenOrSynthetic(siteTarget)) return false
         return !isHiddenOrSynthetic(siteTarget, useSiteTargetFilterForPropertyAccessor)
     }
-
-    val originalElement = declaration.sourcePsiSafe<KtDeclaration>()
 
     val getter = declaration.getter?.takeIf {
         it.needToCreateAccessor(AnnotationUseSiteTarget.PROPERTY_GETTER)
