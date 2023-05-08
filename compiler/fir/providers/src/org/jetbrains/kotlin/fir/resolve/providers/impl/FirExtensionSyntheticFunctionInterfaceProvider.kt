@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.addDeclaration
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.providers.FirSymbolNamesProvider
 import org.jetbrains.kotlin.fir.resolve.providers.FirSymbolProvider
 import org.jetbrains.kotlin.fir.resolve.providers.FirSymbolProviderInternals
 import org.jetbrains.kotlin.fir.scopes.FirKotlinScopeProvider
@@ -84,14 +85,27 @@ abstract class FirSyntheticFunctionInterfaceProviderBase(
     val moduleData: FirModuleData,
     val kotlinScopeProvider: FirKotlinScopeProvider
 ) : FirSymbolProvider(session) {
-    @OptIn(FirSymbolProviderInternals::class)
-    override fun getClassLikeSymbolByClassId(classId: ClassId): FirRegularClassSymbol? {
-        if (!classId.mayBeSyntheticFunctionClassName()) return null
-        return getClassLikeSymbolByClassIdWithoutClassIdChecks(classId)
+    override val symbolNamesProvider: FirSymbolNamesProvider = object : FirSymbolNamesProvider() {
+        override val mayHaveSyntheticFunctionTypes: Boolean get() = true
+
+        @OptIn(FirSymbolProviderInternals::class)
+        override fun mayHaveSyntheticFunctionType(classId: ClassId): Boolean = classId.isNameForFunctionClass(session)
+
+        override fun getTopLevelClassifierNamesInPackage(packageFqName: FqName): Set<String> =
+            // Generated function type names aren't included in the top-level classifier names set.
+            emptySet()
+
+        override fun getPackageNamesWithTopLevelCallables(): Set<String> = emptySet()
+        override fun getTopLevelCallableNamesInPackage(packageFqName: FqName): Set<Name> = emptySet()
+
+        override fun mayHaveTopLevelClassifier(classId: ClassId): Boolean = mayHaveSyntheticFunctionType(classId)
+        override fun mayHaveTopLevelCallable(packageFqName: FqName, name: Name): Boolean = false
     }
 
-    @FirSymbolProviderInternals
-    fun getClassLikeSymbolByClassIdWithoutClassIdChecks(classId: ClassId): FirRegularClassSymbol? = cache.getValue(classId)
+    override fun getClassLikeSymbolByClassId(classId: ClassId): FirRegularClassSymbol? {
+        if (!symbolNamesProvider.mayHaveTopLevelClassifier(classId)) return null
+        return cache.getValue(classId)
+    }
 
     @FirSymbolProviderInternals
     override fun getTopLevelCallableSymbolsTo(destination: MutableList<FirCallableSymbol<*>>, packageFqName: FqName, name: Name) {
@@ -110,21 +124,6 @@ abstract class FirSyntheticFunctionInterfaceProviderBase(
 
     override fun getPackage(fqName: FqName): FqName? {
         return fqName.takeIf { session.functionTypeService.hasKindWithSpecificPackage(it) }
-    }
-
-    override fun computePackageSetWithTopLevelCallables(): Set<String> {
-        return emptySet()
-    }
-
-    /**
-     * This method has no sense for synthetic function interfaces
-     */
-    override fun knownTopLevelClassifiersInPackage(packageFqName: FqName): Set<String>? {
-        return emptySet()
-    }
-
-    override fun computeCallableNamesInPackage(packageFqName: FqName): Set<Name>? {
-        return emptySet()
     }
 
     private val cache = moduleData.session.firCachesFactory.createCache(::createSyntheticFunctionInterface)
@@ -258,6 +257,12 @@ abstract class FirSyntheticFunctionInterfaceProviderBase(
     private fun FunctionTypeKind.classId(arity: Int) = ClassId(packageFqName, numberedClassName(arity))
 
     companion object {
+        @FirSymbolProviderInternals
+        fun ClassId.isNameForFunctionClass(session: FirSession): Boolean {
+            if (!mayBeSyntheticFunctionClassName()) return false
+            return session.functionTypeService.getKindByClassNamePrefix(packageFqName, shortClassName.asString()) != null
+        }
+
         /**
          * A [ClassId] can only be a name for a generated function class if it ends with a digit. See [FunctionTypeKind].
          *
