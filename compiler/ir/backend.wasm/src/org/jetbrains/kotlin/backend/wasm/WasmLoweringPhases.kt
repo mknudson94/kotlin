@@ -712,7 +712,6 @@ val wasmPhases = SameTypeNamedCompilerPhase(
             associatedObjectsLowering then
 
             objectDeclarationLoweringPhase then
-            fieldInitializersLoweringPhase then
             genericReturnTypeLowering then
             unitToVoidLowering then
 
@@ -720,8 +719,12 @@ val wasmPhases = SameTypeNamedCompilerPhase(
             builtInsLoweringPhase0 then
 
             autoboxingTransformerPhase then
-            explicitlyCastExternalTypesPhase then
+
             objectUsageLoweringPhase then
+            purifyObjectInstanceGettersLoweringPhase then
+            fieldInitializersLoweringPhase then
+
+            explicitlyCastExternalTypesPhase then
             typeOperatorLoweringPhase then
 
             // Clean up built-ins after type operator lowering
@@ -730,7 +733,6 @@ val wasmPhases = SameTypeNamedCompilerPhase(
             virtualDispatchReceiverExtractionPhase then
             staticMembersLoweringPhase then
             wasmNullSpecializationLowering then
-            purifyObjectInstanceGettersLoweringPhase then
             inlineObjectsWithPureInitializationLoweringPhase then
             validateIrAfterLowering
 )
