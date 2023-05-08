@@ -16,8 +16,8 @@ import java.nio.file.Path
 import kotlin.streams.asSequence
 
 @DisplayName("FUS statistic")
-@JvmGradlePluginTests
-class FusStatisticsIT : KGPBaseTest() {
+//Tests for FUS statistics have to create new instance of KotlinBuildStatsService
+class FusStatisticsIT : KGPDaemonsBaseTest() {
     @DisplayName("for dokka")
     @GradleTest
     fun testDokka(gradleVersion: GradleVersion) {
