@@ -374,6 +374,12 @@ public class JsFirInvalidationTestGenerated extends AbstractJsFirInvalidationTes
     }
 
     @Test
+    @TestMetadata("openClassOpenMethods")
+    public void testOpenClassOpenMethods() throws Exception {
+        runTest("js/js.translator/testData/incremental/invalidation/openClassOpenMethods/");
+    }
+
+    @Test
     @TestMetadata("privateDeclarationLeakThroughDefaultParam")
     public void testPrivateDeclarationLeakThroughDefaultParam() throws Exception {
         runTest("js/js.translator/testData/incremental/invalidation/privateDeclarationLeakThroughDefaultParam/");

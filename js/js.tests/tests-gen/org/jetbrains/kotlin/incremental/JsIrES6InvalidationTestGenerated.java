@@ -374,6 +374,12 @@ public class JsIrES6InvalidationTestGenerated extends AbstractJsIrES6Invalidatio
     }
 
     @Test
+    @TestMetadata("openClassOpenMethods")
+    public void testOpenClassOpenMethods() throws Exception {
+        runTest("js/js.translator/testData/incremental/invalidation/openClassOpenMethods/");
+    }
+
+    @Test
     @TestMetadata("privateDeclarationLeakThroughDefaultParam")
     public void testPrivateDeclarationLeakThroughDefaultParam() throws Exception {
         runTest("js/js.translator/testData/incremental/invalidation/privateDeclarationLeakThroughDefaultParam/");

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.ir.backend.js.dce
 
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.backend.js.JsIrBackendContext
 import org.jetbrains.kotlin.ir.backend.js.JsStatementOrigins
 import org.jetbrains.kotlin.ir.backend.js.export.isExported
@@ -174,6 +175,21 @@ internal class JsUsefulDeclarationProcessor(
         }
     }
 
+    private fun findFirstFakeOverrideAfterInterfaceDefaultMethod(declaration: IrOverridableDeclaration<*>): IrDeclaration? {
+        if (declaration.isFakeOverride && declaration.modality == Modality.OPEN && declaration.parentClassOrNull?.isClass == true) {
+            for (overriddenSymbol in declaration.overriddenSymbols) {
+                val overriddenDeclaration = overriddenSymbol.owner as? IrOverridableDeclaration<*> ?: continue
+                val parent = overriddenDeclaration.parentClassOrNull ?: continue
+                val firstFakeOverride = when {
+                    parent.isInterface -> declaration.takeIf { overriddenDeclaration.modality == Modality.OPEN } ?: continue
+                    else -> findFirstFakeOverrideAfterInterfaceDefaultMethod(overriddenDeclaration) ?: continue
+                }
+                return firstFakeOverride
+            }
+        }
+        return null
+    }
+
     override fun processSimpleFunction(irFunction: IrSimpleFunction) {
         super.processSimpleFunction(irFunction)
 
@@ -184,6 +200,8 @@ internal class JsUsefulDeclarationProcessor(
         if (irFunction.isReal && irFunction.body != null) {
             irFunction.parentClassOrNull?.takeIf { it.isInterface }?.enqueue(irFunction, "interface default method is used")
         }
+
+        findFirstFakeOverrideAfterInterfaceDefaultMethod(irFunction)?.enqueue(irFunction, "first fake override of interface default")
 
         if (context.es6mode && isEsModules) return
 

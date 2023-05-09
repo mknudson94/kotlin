@@ -5145,6 +5145,12 @@ public class IrBoxJsTestGenerated extends AbstractIrBoxJsTest {
         }
 
         @Test
+        @TestMetadata("overrideDefaultInterfaceMethod.kt")
+        public void testOverrideDefaultInterfaceMethod() throws Exception {
+            runTest("js/js.translator/testData/box/inheritance/overrideDefaultInterfaceMethod.kt");
+        }
+
+        @Test
         @TestMetadata("prototypeOrder.kt")
         public void testPrototypeOrder() throws Exception {
             runTest("js/js.translator/testData/box/inheritance/prototypeOrder.kt");

@@ -1,10 +1,8 @@
 fun box(stepId: Int): String {
     val expected = when (stepId) {
-        0 -> 10
-        1 -> 13
-        2 -> 16
-        3 -> 22
-        4 -> 25
+        0, 3 -> 4
+        1 -> 6
+        2 -> 8
         else -> return "Unknown"
     }
 
