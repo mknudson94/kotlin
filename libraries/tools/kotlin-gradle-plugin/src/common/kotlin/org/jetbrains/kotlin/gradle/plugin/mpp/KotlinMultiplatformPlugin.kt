@@ -185,6 +185,7 @@ class KotlinMultiplatformPlugin : Plugin<Project> {
             }
 
             val targetName = if (target is KotlinNativeTarget)
+//                target.targetName
                 target.konanTarget.name
             else
                 target.platformType.name
