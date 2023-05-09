@@ -102,6 +102,40 @@ private fun FirTypeScope.processOverriddenFunctionsWithVisited(
         visited
     )
 
+fun <S : FirCallableSymbol<*>> FirTypeScope.anyOverriddenOf(
+    callableSymbol: S,
+    predicate: (S) -> Boolean
+): Boolean {
+    var result = false
+
+    when (callableSymbol) {
+        is FirNamedFunctionSymbol -> {
+            processOverriddenFunctions(callableSymbol) {
+                @Suppress("UNCHECKED_CAST")
+                if (predicate(it as S)) {
+                    result = true
+                    return@processOverriddenFunctions ProcessorAction.STOP
+                }
+
+                return@processOverriddenFunctions ProcessorAction.NEXT
+            }
+        }
+        is FirPropertySymbol -> {
+            processOverriddenProperties(callableSymbol) {
+                @Suppress("UNCHECKED_CAST")
+                if (predicate(it as S)) {
+                    result = true
+                    return@processOverriddenProperties ProcessorAction.STOP
+                }
+
+                return@processOverriddenProperties ProcessorAction.NEXT
+            }
+        }
+    }
+
+    return result
+}
+
 fun FirTypeScope.processOverriddenProperties(
     propertySymbol: FirPropertySymbol,
     processor: (FirPropertySymbol) -> ProcessorAction
