@@ -1,27 +1,47 @@
 ## FIR/Builder inference
+See also: [Kotlin Spec: Builder-style type inference](https://kotlinlang.org/spec/type-inference.html#builder-style-type-inference)
 
 ### Glossary
+#### CS = Constraint system
+An instance of `org.jetbrains.kotlin.resolve.calls.inference.model.NewConstraintSystemImpl`
 #### Call-tree
 A tree of calls, in which constraint systems are joined and solved(completed) together
 #### Postponed type variable
-Type-variable, that was used to build a stub type on, and fixation of which is postponed until the end of lambda analysis
+Type-variable, that was used to build a stub type on, and fixation of which is postponed until the end of lambda analysis.
+Selection of type variables to postpone happens during [Initiation](#initiation) phase
 #### Stub type
-Type, that is equal to anything from the perspective of subtyping
+Type, that is equal to anything from the perspective of subtyping.
 Carries information about its base postponed type variable
+
+Such types are used during [analysis of lambda body](#lambda-body-analysis) inplace of postponed type variables to resolve calls,
+after end of analysis occurrences of such types are replaced with corresponding type inference result for its base type variable
+
+Ex:
+```kotlin
+buildList { /* this: MutableList<Stub(T)> -> */
+    val self/*: MutableList<Stub(T)> */ = this
+    self.add("") // String <: Stub(T) from argument
+}
+```
+#### Proper constraint
+A constraint that doesn't reference any type variables
 ### Builder inference algorithm
 The algorithm consists of the following phases, all of which happen during constraint system completion
-- Initiation - deciding if lambda is suitable for builder inference
-- Lambda analysis preparation - stub type and builder inference session creating
-- Lambda body analysis - collecting calls inside lambda body, which references stub-types among input types
-- Lambda analysis finalization - integrating collected information
-    - Result write - writing of builder inference result to FIR tree of lambda (and implicit receiver stack update)
-    - Result backpropagation - propagation of builder inference result to CS of call-tree
+- [Initiation](#initiation) - deciding if lambda is suitable for builder inference
+- [Lambda analysis preparation](#lambda-analysis-preparation) - stub type and builder inference session creating
+- [Lambda body analysis](#lambda-body-analysis) - collecting calls inside lambda body, which references stub-types among input types
+- [Lambda analysis finalization](#lambda-analysis-finalization) - integrating collected information
+    - [Result write](#result-write) - writing of builder inference result to FIR tree of lambda (and implicit receiver stack update)
+    - [Result backpropagation](#result-backpropagation) - propagation of builder inference result to CS of call-tree
 
 ### Detailed description
 #### Initiation
-Entrypoint to builder inference is a function `org.jetbrains.kotlin.fir.resolve.inference.ConstraintSystemCompleter.tryToCompleteWithBuilderInference`
+Before, we try to fix all type variables that have enough type info to be fixed and analyze all lambda arguments, 
+whose input types depend on such type variables. 
 
-Before, we try to fix all type variables that have proper constraints and analyze all arguments, whose input types depend on such type variables
+If there are still not analyzed lambda arguments left, we try to perform builder inference
+
+Entrypoint to builder inference is the function `org.jetbrains.kotlin.fir.resolve.inference.ConstraintSystemCompleter.tryToCompleteWithBuilderInference`
 
 *It happens only during full completion*
 
