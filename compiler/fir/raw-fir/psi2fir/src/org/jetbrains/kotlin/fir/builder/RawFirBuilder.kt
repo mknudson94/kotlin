@@ -761,28 +761,34 @@ open class RawFirBuilder(
                 }
                 val owner = parameter.getStrictParentOfType<KtTypeParameterListOwner>() ?: return@buildTypeParameter
                 for (typeConstraint in owner.typeConstraints) {
-                    val subjectName = typeConstraint.subjectTypeParameterName?.getReferencedNameAsName()
+                    val subjectTypeParameterName = typeConstraint.subjectTypeParameterName
+                    val subjectName = subjectTypeParameterName?.getReferencedNameAsName()
 
                     if (subjectName == parameterName) {
                         bounds += typeConstraint.boundTypeReference.toFirOrErrorType()
-                    }
+                        selfRefs += buildUserTypeRef {
+                            source = subjectTypeParameterName.toFirSourceElement()
+                            isMarkedNullable = false
+                            subjectName.let { qualifier += FirQualifierPartImpl(source, it, FirTypeArgumentListImpl(null)) }
+                        }
 
-                    for (entry in typeConstraint.annotationEntries) {
-                        annotations += buildErrorAnnotationCall {
-                            source = entry.toFirSourceElement()
-                            useSiteTarget = entry.useSiteTarget?.getAnnotationUseSiteTarget()
-                            annotationTypeRef = entry.typeReference.toFirOrErrorType()
-                            diagnostic = ConeSimpleDiagnostic(
-                                "Type parameter annotations are not allowed inside where clauses", DiagnosticKind.AnnotationNotAllowed,
-                            )
-                            val name = (annotationTypeRef as? FirUserTypeRef)?.qualifier?.last()?.name
-                                ?: Name.special("<no-annotation-name>")
-                            calleeReference = buildSimpleNamedReference {
-                                source = (entry.typeReference?.typeElement as? KtUserType)?.referenceExpression?.toFirSourceElement()
-                                this.name = name
+                        for (entry in typeConstraint.annotationEntries) {
+                            annotations += buildErrorAnnotationCall {
+                                source = entry.toFirSourceElement()
+                                useSiteTarget = entry.useSiteTarget?.getAnnotationUseSiteTarget()
+                                annotationTypeRef = entry.typeReference.toFirOrErrorType()
+                                diagnostic = ConeSimpleDiagnostic(
+                                    "Type parameter annotations are not allowed inside where clauses", DiagnosticKind.AnnotationNotAllowed,
+                                )
+                                val name = (annotationTypeRef as? FirUserTypeRef)?.qualifier?.last()?.name
+                                    ?: Name.special("<no-annotation-name>")
+                                calleeReference = buildSimpleNamedReference {
+                                    source = (entry.typeReference?.typeElement as? KtUserType)?.referenceExpression?.toFirSourceElement()
+                                    this.name = name
+                                }
+                                entry.extractArgumentsTo(this)
+                                typeArguments.appendTypeArguments(entry.typeArguments)
                             }
-                            entry.extractArgumentsTo(this)
-                            typeArguments.appendTypeArguments(entry.typeArguments)
                         }
                     }
                 }

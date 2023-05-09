@@ -343,6 +343,7 @@ object NodeConfigurator : AbstractFieldConfigurator<FirTreeBuilder>(FirTreeBuild
             +field(varianceType)
             +booleanField("isReified")
             +fieldList("bounds", typeRef, withReplace = true)
+            +fieldList("selfRefs", typeRef, withReplace = true)
             +annotations
         }
 
