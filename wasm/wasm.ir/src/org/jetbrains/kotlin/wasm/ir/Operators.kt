@@ -400,10 +400,6 @@ enum class WasmOp(
     BR_ON_CAST_FAIL_DEPRECATED("br_on_cast_fail", 0xFB_47, listOf(LABEL_IDX, STRUCT_TYPE_IDX)),
     BR_ON_NON_DATA_DEPRECATED("br_on_non_data_fail", 0xFB_64, listOf(LABEL_IDX)),
 
-    // ============================================================
-    // Pseudo-instruction, just alias for a normal call. It's used to easily spot get_unit on the wasm level.
-    GET_UNIT("global.get", 0x10, GLOBAL_IDX),
-
     PSEUDO_COMMENT_PREVIOUS_INSTR("<comment-single>", WASM_OP_PSEUDO_OPCODE),
     PSEUDO_COMMENT_GROUP_START("<comment-group-start>", WASM_OP_PSEUDO_OPCODE),
     PSEUDO_COMMENT_GROUP_END("<comment-group-end>", WASM_OP_PSEUDO_OPCODE),
