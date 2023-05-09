@@ -1,0 +1,11 @@
+package one
+
+class A constructor(a: Int) {
+    fun boo() {
+        fun bar() {
+
+        }
+    }
+
+    val i: Int = 42
+}
