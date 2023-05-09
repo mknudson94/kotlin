@@ -3838,6 +3838,12 @@ public class LLFirPreresolvedReversedDiagnosticCompilerFE10TestDataTestGenerated
                 }
 
                 @Test
+                @TestMetadata("incorrectNumberOfTypeArguments.kt")
+                public void testIncorrectNumberOfTypeArguments() throws Exception {
+                    runTest("compiler/testData/diagnostics/tests/callableReference/generic/incorrectNumberOfTypeArguments.kt");
+                }
+
+                @Test
                 @TestMetadata("kt10968.kt")
                 public void testKt10968() throws Exception {
                     runTest("compiler/testData/diagnostics/tests/callableReference/generic/kt10968.kt");
