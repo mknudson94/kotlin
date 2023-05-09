@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.load.java.structure.impl.source.JavaSourceFactoryOwn
 import org.jetbrains.kotlin.name.FqName;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public abstract class JavaTypeImpl<Psi extends PsiType> implements JavaType, JavaAnnotationOwnerImpl, JavaSourceFactoryOwner {
     private final JavaElementTypeSource<Psi> psiType;
@@ -54,9 +55,13 @@ public abstract class JavaTypeImpl<Psi extends PsiType> implements JavaType, Jav
     }
 
     @NotNull
-    public static JavaTypeImpl<?> create(@NotNull JavaElementTypeSource<PsiType> psiType) {
-        JavaElementSourceFactory sourceFactory = psiType.getFactory();
-        return psiType.getType().accept(new PsiTypeVisitor<JavaTypeImpl<?>>() {
+    public static JavaTypeImpl<?> create(JavaElementTypeSource<? extends PsiType> typeSource) {
+        return create(typeSource.getType(), typeSource);
+    }
+
+    @NotNull
+    public static JavaTypeImpl<?> create(@NotNull PsiType psiType, JavaElementTypeSource<? extends PsiType> typeSource) {
+        return psiType.accept(new PsiTypeVisitor<JavaTypeImpl<?>>() {
 
             @Nullable
             @Override
@@ -66,26 +71,30 @@ public abstract class JavaTypeImpl<Psi extends PsiType> implements JavaType, Jav
 
             @Nullable
             @Override
+            @SuppressWarnings("unchecked")
             public JavaTypeImpl<?> visitPrimitiveType(@NotNull PsiPrimitiveType primitiveType) {
-                return new JavaPrimitiveTypeImpl(sourceFactory.createTypeSource(primitiveType));
+                return new JavaPrimitiveTypeImpl((JavaElementTypeSource<PsiPrimitiveType>)typeSource );
             }
 
             @Nullable
             @Override
+            @SuppressWarnings("unchecked")
             public JavaTypeImpl<?> visitArrayType(@NotNull PsiArrayType arrayType) {
-                return new JavaArrayTypeImpl(sourceFactory.createTypeSource(arrayType));
+                return new JavaArrayTypeImpl((JavaElementTypeSource<PsiArrayType>) typeSource);
             }
 
             @Nullable
             @Override
+            @SuppressWarnings("unchecked")
             public JavaTypeImpl<?> visitClassType(@NotNull PsiClassType classType) {
-                return new JavaClassifierTypeImpl(sourceFactory.createTypeSource(classType));
+                return new JavaClassifierTypeImpl((JavaElementTypeSource<PsiClassType>) typeSource);
             }
 
             @Nullable
             @Override
+            @SuppressWarnings("unchecked")
             public JavaTypeImpl<?> visitWildcardType(@NotNull PsiWildcardType wildcardType) {
-                return new JavaWildcardTypeImpl(sourceFactory.createTypeSource(wildcardType));
+                return new JavaWildcardTypeImpl((JavaElementTypeSource<PsiWildcardType>) typeSource);
             }
         });
     }

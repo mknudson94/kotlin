@@ -14,7 +14,7 @@ class JavaRecordComponentImpl(
     psi: JavaElementPsiSource<PsiRecordComponent>
 ) : JavaMemberImpl<PsiRecordComponent>(psi), JavaRecordComponent {
     override val type: JavaType
-        get() = JavaTypeImpl.create(sourceFactory.createTypeSource(psi.type))
+        get() = JavaTypeImpl.create(psiElement.psi.type, sourceFactory.createVariableReturnTypeSource(psiElement))
 
     override val isVararg: Boolean
         get() = psi.isVarArgs

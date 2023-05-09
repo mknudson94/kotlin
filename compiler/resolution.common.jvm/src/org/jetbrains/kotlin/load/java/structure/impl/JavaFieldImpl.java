@@ -39,7 +39,7 @@ public class JavaFieldImpl extends JavaMemberImpl<PsiField> implements JavaField
     @Override
     @NotNull
     public JavaType getType() {
-        return JavaTypeImpl.create(createTypeSource(getPsi().getType()));
+        return JavaTypeImpl.create(psiElement.getPsi().getType(), createVariableReturnTypeSource(psiElement));
     }
 
     @Nullable
