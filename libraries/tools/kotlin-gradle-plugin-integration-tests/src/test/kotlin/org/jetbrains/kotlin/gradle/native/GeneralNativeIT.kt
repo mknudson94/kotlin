@@ -294,13 +294,7 @@ class GeneralNativeIT : KGPBaseTest() {
     fun testCanProduceNativeFrameworks(gradleVersion: GradleVersion) {
         nativeProject("native-binaries/frameworks", gradleVersion = gradleVersion) {
             fun assemble(assertions: BuildResult.() -> Unit) {
-                build(
-                    "assemble",
-                    // TODO(Dmitrii Krasnov): parallel=false is placed here because getOutputForTask works unstable
-                    //  and can mixe logs from different tasks, when they are executed parallel.
-                    buildOptions = defaultBuildOptions.copy(parallel = false, logLevel = LogLevel.DEBUG),
-                    assertions = assertions
-                )
+                build("assemble", assertions = assertions)
             }
 
             data class BinaryMeta(val name: String, val isStatic: Boolean = false)
@@ -549,7 +543,7 @@ class GeneralNativeIT : KGPBaseTest() {
     @GradleTest
     fun testKotlinOptions(gradleVersion: GradleVersion) {
         nativeProject("native-kotlin-options", gradleVersion) {
-            build(":compileKotlinHost", buildOptions = defaultBuildOptions.copy(logLevel = LogLevel.DEBUG)) {
+            build(":compileKotlinHost") {
                 assertNativeTasksCommandLineArguments(":compileKotlinHost") { arguments ->
                     assertCommandLineArgumentsDoNotContain("-verbose", commandLineArguments = arguments)
                 }
@@ -560,7 +554,7 @@ class GeneralNativeIT : KGPBaseTest() {
             buildGradle.appendText(
                 """kotlin.targets["host"].compilations["main"].kotlinOptions.verbose = true"""
             )
-            build(":compileKotlinHost", buildOptions = defaultBuildOptions.copy(logLevel = LogLevel.DEBUG)) {
+            build(":compileKotlinHost") {
                 assertNativeTasksCommandLineArguments(":compileKotlinHost") { arguments ->
                     assertCommandLineArgumentsContain("-verbose", commandLineArguments = arguments)
                 }
@@ -874,8 +868,6 @@ class GeneralNativeIT : KGPBaseTest() {
             // Enable info log to see cinterop environment variables.
             build(
                 ":projectLibrary:build",
-                // TODO(Dmitrii Krasnov): check how can we rewrite this test to info level
-                buildOptions = defaultBuildOptions.copy(logLevel = LogLevel.DEBUG)
             ) {
                 assertTasksExecuted(":projectLibrary:cinteropAnotherNumberHost")
                 libraryFiles("projectLibrary", "anotherNumber").forEach { assertFileExists(it) }
@@ -1007,8 +999,6 @@ class GeneralNativeIT : KGPBaseTest() {
 
             build(
                 "compileKotlin${nativeHostTargetName.capitalize()}",
-                buildOptions = defaultBuildOptions.copy(LogLevel.DEBUG),
-                enableGradleDebug = true
             ) {
                 assertNativeTasksCommandLineArguments(":compileKotlin${nativeHostTargetName.capitalize()}") { arguments ->
                     val escapedQuotedPath =
@@ -1030,7 +1020,7 @@ class GeneralNativeIT : KGPBaseTest() {
                     }
                 """.trimIndent()
             )
-            build(":linkDebugExecutableHost", buildOptions = defaultBuildOptions.copy(LogLevel.DEBUG)) {
+            build(":linkDebugExecutableHost") {
                 assertNativeTasksCommandLineArguments(":linkDebugExecutableHost") {
                     assertCommandLineArgumentsContain("-Xbinary=memoryModel=experimental", commandLineArguments = it)
                 }
@@ -1045,7 +1035,6 @@ class GeneralNativeIT : KGPBaseTest() {
             build(
                 ":linkDebugExecutableHost",
                 "-Pkotlin.native.binary.memoryModel=experimental",
-                buildOptions = defaultBuildOptions.copy(LogLevel.DEBUG)
             ) {
                 assertNativeTasksCommandLineArguments(":linkDebugExecutableHost") {
                     assertCommandLineArgumentsContain("-Xbinary=memoryModel=experimental", commandLineArguments = it)
@@ -1068,7 +1057,6 @@ class GeneralNativeIT : KGPBaseTest() {
             build(
                 ":linkDebugExecutableHost",
                 "-Pkotlin.native.binary.memoryModel=strict",
-                buildOptions = defaultBuildOptions.copy(LogLevel.DEBUG)
             ) {
                 assertNativeTasksCommandLineArguments(":linkDebugExecutableHost") {
                     // Options set in the DSL have higher priority than options set in project properties.
