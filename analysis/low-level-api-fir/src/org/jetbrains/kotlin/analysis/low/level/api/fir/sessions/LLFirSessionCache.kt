@@ -397,19 +397,16 @@ internal class LLFirSessionCache(private val project: Project) {
         module: KtCodeFragmentModule
     ): LLFirCodeFragmentResolvableModuleSession {
         val builtinsSession = LLFirBuiltinsSessionFactory.getInstance(project).getBuiltinsSession(JvmPlatforms.unspecifiedJvmPlatform)
-        //val platform = module.platform
-        //val languageVersionSettings = LanguageVersionSettingsImpl.DEFAULT
         val scopeProvider = FirKotlinScopeProvider(::wrapScopeWithJvmMapped)
         val globalResolveComponents = LLFirGlobalResolveComponents(project)
         val components = LLFirModuleResolveComponents(
-            module.directDependsOnDependencies.first(),
+            module.place.containingFile.getKtModule(module.project),
             globalResolveComponents,
             scopeProvider
         )
 
         val dependencies = collectSourceModuleDependencies(module)
         val dependencyTracker = createSourceModuleDependencyTracker(module, dependencies)
-        //val contentScope = module.contentScope
         return LLFirCodeFragmentResolvableModuleSession(
             builtinsSession.ktModule,
             dependencyTracker,
