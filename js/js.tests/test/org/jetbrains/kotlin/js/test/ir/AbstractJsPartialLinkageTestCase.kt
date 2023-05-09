@@ -57,14 +57,16 @@ import java.nio.charset.Charset
 import kotlin.io.path.createTempDirectory
 
 abstract class AbstractJsPartialLinkageNoICTestCase : AbstractJsPartialLinkageTestCase(CompilerType.K1_NO_IC)
+abstract class AbstractJsPartialLinkageNoICES6TestCase : AbstractJsPartialLinkageTestCase(CompilerType.K1_NO_IC_WITH_ES6)
 abstract class AbstractJsPartialLinkageWithICTestCase : AbstractJsPartialLinkageTestCase(CompilerType.K1_WITH_IC)
 abstract class AbstractFirJsPartialLinkageNoICTestCase : AbstractJsPartialLinkageTestCase(CompilerType.K2_NO_IC)
 
 abstract class AbstractJsPartialLinkageTestCase(val compilerType: CompilerType) : KtUsefulTestCase() {
-    enum class CompilerType(val testModeName: String) {
-        K1_NO_IC("JS_NO_IC"),
-        K1_WITH_IC("JS_WITH_IC"),
-        K2_NO_IC("JS_NO_IC")
+    enum class CompilerType(val testModeName: String, val es6Mode: Boolean) {
+        K1_NO_IC("JS_NO_IC", false),
+        K1_NO_IC_WITH_ES6("JS_NO_IC", true),
+        K1_WITH_IC("JS_WITH_IC", false),
+        K2_NO_IC("JS_NO_IC", false)
     }
 
     private lateinit var buildDir: File
@@ -136,7 +138,8 @@ abstract class AbstractJsPartialLinkageTestCase(val compilerType: CompilerType) 
             .forEach { file -> file.copyTo(buildDirs.outputDir.resolve(file.relativeTo(buildDirs.sourceDir)), overwrite = true) }
 
         when (compilerType) {
-            CompilerType.K1_NO_IC, CompilerType.K1_WITH_IC -> buildKlibWithK1(moduleName, buildDirs.sourceDir, dependencies, klibFile)
+            CompilerType.K1_NO_IC, CompilerType.K1_NO_IC_WITH_ES6, CompilerType.K1_WITH_IC ->
+                buildKlibWithK1(moduleName, buildDirs.sourceDir, dependencies, klibFile)
             CompilerType.K2_NO_IC -> buildKlibWithK2(moduleName, buildDirs.sourceDir, dependencies, klibFile)
         }
     }
@@ -247,7 +250,8 @@ abstract class AbstractJsPartialLinkageTestCase(val compilerType: CompilerType) 
         configuration.setupPartialLinkageConfig(PartialLinkageConfig(PartialLinkageMode.ENABLE, PartialLinkageLogLevel.WARNING))
 
         val compilationOutputs = when (compilerType) {
-            CompilerType.K1_NO_IC, CompilerType.K2_NO_IC -> buildBinaryNoIC(configuration, mainModuleKlibFile, allDependencies)
+            CompilerType.K1_NO_IC, CompilerType.K1_NO_IC_WITH_ES6, CompilerType.K2_NO_IC ->
+                buildBinaryNoIC(configuration, mainModuleKlibFile, allDependencies, compilerType.es6Mode)
             CompilerType.K1_WITH_IC -> buildBinaryWithIC(configuration, mainModuleKlibFile, allDependencies)
         }
 
@@ -288,7 +292,8 @@ abstract class AbstractJsPartialLinkageTestCase(val compilerType: CompilerType) 
     private fun buildBinaryNoIC(
         configuration: CompilerConfiguration,
         mainModuleKlibFile: File,
-        allDependencies: Dependencies
+        allDependencies: Dependencies,
+        es6mode: Boolean
     ): CompilationOutputs {
         val klib = MainModule.Klib(mainModuleKlibFile.path)
         val moduleStructure = ModulesStructure(
@@ -304,7 +309,8 @@ abstract class AbstractJsPartialLinkageTestCase(val compilerType: CompilerType) 
             PhaseConfig(jsPhases),
             IrFactoryImplForJsIC(WholeWorldStageController()),
             exportedDeclarations = setOf(BOX_FUN_FQN),
-            granularity = JsGenerationGranularity.PER_MODULE
+            granularity = JsGenerationGranularity.PER_MODULE,
+            es6mode = es6mode
         )
 
         val transformer = IrModuleToJsTransformer(
