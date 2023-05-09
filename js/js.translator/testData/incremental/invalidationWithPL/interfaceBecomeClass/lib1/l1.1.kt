@@ -1,3 +1,3 @@
-abstract class Foo {
+open class Foo {
     fun getSomething() = 77
 }

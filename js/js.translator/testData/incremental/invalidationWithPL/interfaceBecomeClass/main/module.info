@@ -1,12 +1,12 @@
 STEP 0:
-    dependencies: lib1
+    dependencies: lib1, lib2
     modifications:
+        U : klass.0.kt -> klass.kt
     added file: m.kt, test.kt, klass.kt
-STEP 1:
-    dependencies: lib1
+STEP 1..2:
+    dependencies: lib1, lib2
     rebuild klib: false
     updated imports: test.kt, klass.kt
-STEP 2:
-    dependencies: lib1
+STEP 3:
+    dependencies: lib1, lib2
     rebuild klib: false
-    updated imports: test.kt, klass.kt

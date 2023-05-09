@@ -32,15 +32,21 @@ public class JsIrInvalidationWithPLTestGenerated extends AbstractJsIrInvalidatio
     }
 
     @Test
-    @TestMetadata("interfaceBecomeAbstractClass")
-    public void testInterfaceBecomeAbstractClass() throws Exception {
-        runTest("js/js.translator/testData/incremental/invalidationWithPL/interfaceBecomeAbstractClass/");
+    @TestMetadata("interfaceBecomeClass")
+    public void testInterfaceBecomeClass() throws Exception {
+        runTest("js/js.translator/testData/incremental/invalidationWithPL/interfaceBecomeClass/");
     }
 
     @Test
     @TestMetadata("removeFunction")
     public void testRemoveFunction() throws Exception {
         runTest("js/js.translator/testData/incremental/invalidationWithPL/removeFunction/");
+    }
+
+    @Test
+    @TestMetadata("removeFunctionFromBlock")
+    public void testRemoveFunctionFromBlock() throws Exception {
+        runTest("js/js.translator/testData/incremental/invalidationWithPL/removeFunctionFromBlock/");
     }
 
     @Test
