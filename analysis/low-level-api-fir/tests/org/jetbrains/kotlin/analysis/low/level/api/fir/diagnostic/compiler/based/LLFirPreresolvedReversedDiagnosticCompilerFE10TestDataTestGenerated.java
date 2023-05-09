@@ -32223,6 +32223,12 @@ public class LLFirPreresolvedReversedDiagnosticCompilerFE10TestDataTestGenerated
             }
 
             @Test
+            @TestMetadata("suspendAnonymousAsNonSuspend.kt")
+            public void testSuspendAnonymousAsNonSuspend() throws Exception {
+                runTest("compiler/testData/diagnostics/tests/suspendConversion/suspendAnonymousAsNonSuspend.kt");
+            }
+
+            @Test
             @TestMetadata("suspendCallFromAnonymousSuspend.kt")
             public void testSuspendCallFromAnonymousSuspend() throws Exception {
                 runTest("compiler/testData/diagnostics/tests/suspendConversion/suspendCallFromAnonymousSuspend.kt");
