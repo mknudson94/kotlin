@@ -40,10 +40,11 @@ class TypeClsStubBuilder(private val c: ClsStubBuilderContext) {
         additionalAnnotations: () -> List<AnnotationWithTarget> = { emptyList() },
         loadTypeAnnotations: (Type) -> List<AnnotationWithArgs> = { c.components.annotationLoader.loadTypeAnnotations(it, c.nameResolver) }
     ) {
-        val abbreviatedType = type.abbreviatedType(c.typeTable)
-        if (abbreviatedType != null) {
-            return createTypeReferenceStub(parent, abbreviatedType, additionalAnnotations)
-        }
+        // TODO: Make type aliases work, see KT-58542
+        // val abbreviatedType = type.abbreviatedType(c.typeTable)
+        // if (abbreviatedType != null) {
+        //     return createTypeReferenceStub(parent, abbreviatedType, additionalAnnotations)
+        // }
 
         val typeReference = KotlinPlaceHolderStubImpl<KtTypeReference>(parent, KtStubElementTypes.TYPE_REFERENCE)
 
