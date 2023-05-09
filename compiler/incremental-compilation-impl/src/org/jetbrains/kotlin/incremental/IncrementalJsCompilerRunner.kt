@@ -237,7 +237,7 @@ class IncrementalJsCompilerRunner(
         private val caches: IncrementalJsCachesManager,
         private val sourcesToCompile: Set<File>
     ) : IncrementalNextRoundChecker {
-        val newDirtySources = LinkedHashSet<File>()
+        val newDirtySources = HashSet<File>()
 
         private val emptyByteArray = ByteArray(0)
         private val translatedFiles = HashMap<File, TranslationResultValue>()

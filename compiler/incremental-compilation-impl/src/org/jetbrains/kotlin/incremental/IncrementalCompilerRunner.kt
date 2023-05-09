@@ -441,7 +441,7 @@ abstract class IncrementalCompilerRunner<
         val currentBuildInfo = BuildInfo(startTS = System.currentTimeMillis(), abiSnapshotData?.classpathAbiSnapshot ?: emptyMap())
         val buildDirtyLookupSymbols = HashSet<LookupSymbol>()
         val buildDirtyFqNames = HashSet<FqName>()
-        val allDirtySources = LinkedHashSet<File>()
+        val allDirtySources = HashSet<File>()
         val transaction = icContext.transaction
 
         var exitCode = ExitCode.OK
