@@ -1085,7 +1085,7 @@ class GeneralNativeIT : KGPBaseTest() {
             build(":publishedLibrary:publish")
 
             build(":dependencyInsight", "--configuration", "hostTestCInterop", "--dependency", "org.example:publishedLibrary") {
-                assertOutputContainsVariant("hostApiElements-published", gradleVersion)
+                assertOutputContainsNativeFrameworkVariant("hostApiElements-published", gradleVersion)
             }
 
             subProject("projectLibrary").buildGradle.appendText(
@@ -1098,10 +1098,10 @@ class GeneralNativeIT : KGPBaseTest() {
             )
 
             build(":dependencyInsight", "--configuration", "hostTestCInterop", "--dependency", ":projectLibrary") {
-                assertOutputContainsVariant("hostCInteropApiElements", gradleVersion)
+                assertOutputContainsNativeFrameworkVariant("hostCInteropApiElements", gradleVersion)
             }
             build(":dependencyInsight", "--configuration", "hostCompileKlibraries", "--dependency", ":projectLibrary") {
-                assertOutputContainsVariant("hostApiElements", gradleVersion)
+                assertOutputContainsNativeFrameworkVariant("hostApiElements", gradleVersion)
             }
         }
     }
