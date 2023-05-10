@@ -63,15 +63,18 @@ class ConsentManagerTest {
     fun testConsentRequestAnswerAfterBadInput() = testUserDecision("\nasdasd\nno", false, USER_REFUSAL_MARKER, 3)
 
     private fun testUserDecision(prompt: String, expectedDecision: Boolean, expectedLine: String, promptCount: Int = 1) {
-        val input = StringInputStream(prompt).bufferedReader()
-        val outputStream = ByteArrayOutputStream(255)
-        val consentManager = ConsentManager(modifier, input, PrintStream(outputStream))
-        val userDecision = consentManager.askForConsent()
-        assertEquals(expectedDecision, userDecision)
-        val content = Files.readAllLines(localPropertiesFile)
-        assertTrue(content.contains(expectedLine))
-        val output = String(outputStream.toByteArray())
-        assertContainsExactTimes(output, USER_CONSENT_REQUEST, 1)
-        assertContainsExactTimes(output, PROMPT_REQUEST, promptCount)
+        StringInputStream(prompt).bufferedReader().use { input ->
+            val outputStream = ByteArrayOutputStream(255)
+            PrintStream(outputStream).use { printStream ->
+                val consentManager = ConsentManager(modifier, input, printStream)
+                val userDecision = consentManager.askForConsent()
+                assertEquals(expectedDecision, userDecision)
+                val content = Files.readAllLines(localPropertiesFile)
+                assertTrue(content.contains(expectedLine))
+                val output = String(outputStream.toByteArray())
+                assertContainsExactTimes(output, USER_CONSENT_REQUEST, 1)
+                assertContainsExactTimes(output, PROMPT_REQUEST, promptCount)
+            }
+        }
     }
 }
