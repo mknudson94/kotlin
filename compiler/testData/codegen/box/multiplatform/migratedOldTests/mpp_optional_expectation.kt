@@ -1,7 +1,11 @@
-// TARGET_BACKEND: JS_IR, NATIVE
+// TARGET_BACKEND: JS_IR
+// TARGET_BACKEND: NATIVE
+// TARGET_BACKEND: WASM
+
+// Declaration annotated with '@OptionalExpectation' can only be used in common module sources
+// IGNORE_BACKEND_K1: JS_IR, NATIVE, WASM
 
 // LANGUAGE: +MultiPlatformProjects
-// IGNORE_BACKEND_K1: ANY
 
 @file:Suppress("OPT_IN_USAGE_ERROR")
 

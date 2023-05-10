@@ -1,7 +1,12 @@
 // LANGUAGE: +MultiPlatformProjects
 // !OPT_IN: kotlin.ExperimentalMultiplatform
+// TARGET_BACKEND: JS_IR
+// TARGET_BACKEND: NATIVE
+// TARGET_BACKEND: WASM
 
-// IGNORE_BACKEND_K1: ANY
+// Expected class 'Foo' has no actual declaration in module <common> for JS
+// IGNORE_BACKEND_K1: JS_IR
+
 
 // Can't link symbol function Foo.<get-p>
 // IGNORE_BACKEND: WASM

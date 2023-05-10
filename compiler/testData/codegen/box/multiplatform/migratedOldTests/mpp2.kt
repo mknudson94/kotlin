@@ -1,5 +1,10 @@
 // LANGUAGE: +MultiPlatformProjects
-// IGNORE_BACKEND_K1: ANY
+// TARGET_BACKEND: JS_IR
+// TARGET_BACKEND: NATIVE
+// TARGET_BACKEND: WASM
+
+// Expected class 'C' has no actual declaration in module <common> for JS
+// IGNORE_BACKEND_K1: JS_IR
 
 // MODULE: common
 // FILE: common.kt

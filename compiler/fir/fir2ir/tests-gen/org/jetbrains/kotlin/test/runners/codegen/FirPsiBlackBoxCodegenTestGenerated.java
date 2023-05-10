@@ -33571,39 +33571,15 @@ public class FirPsiBlackBoxCodegenTestGenerated extends AbstractFirPsiBlackBoxCo
                     runTest("compiler/testData/codegen/box/multiplatform/k2/defaultArguments/withTypeParameter.kt");
                 }
             }
+        }
 
-            @Nested
-            @TestMetadata("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests")
-            @TestDataPath("$PROJECT_ROOT")
-            public class MigratedOldTests {
-                @Test
-                public void testAllFilesPresentInMigratedOldTests() throws Exception {
-                    KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
-                }
-
-                @Test
-                @TestMetadata("mpp1.kt")
-                public void testMpp1() throws Exception {
-                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp1.kt");
-                }
-
-                @Test
-                @TestMetadata("mpp2.kt")
-                public void testMpp2() throws Exception {
-                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp2.kt");
-                }
-
-                @Test
-                @TestMetadata("mpp_default_args.kt")
-                public void testMpp_default_args() throws Exception {
-                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp_default_args.kt");
-                }
-
-                @Test
-                @TestMetadata("remap_expect_property_ref.kt")
-                public void testRemap_expect_property_ref() throws Exception {
-                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/remap_expect_property_ref.kt");
-                }
+        @Nested
+        @TestMetadata("compiler/testData/codegen/box/multiplatform/migratedOldTests")
+        @TestDataPath("$PROJECT_ROOT")
+        public class MigratedOldTests {
+            @Test
+            public void testAllFilesPresentInMigratedOldTests() throws Exception {
+                KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/migratedOldTests"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
             }
         }
 
