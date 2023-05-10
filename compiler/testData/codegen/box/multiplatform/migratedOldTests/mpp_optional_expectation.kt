@@ -1,15 +1,13 @@
 // TARGET_BACKEND: JS_IR
 // TARGET_BACKEND: NATIVE
 // TARGET_BACKEND: WASM
+// TARGET_BACKEND: JVM_IR
 
-// Declaration annotated with '@OptionalExpectation' can only be used in common module sources
-// IGNORE_BACKEND_K1: JS_IR, NATIVE, WASM
-
+// Stdlib is needed only for JVM_IR to resolve `kotlin.OptionalExpectation
+// WITH_STDLIB
 // LANGUAGE: +MultiPlatformProjects
 
-@file:Suppress("OPT_IN_USAGE_ERROR")
-
-import kotlin.js.*
+@file:Suppress("OPT_IN_USAGE_ERROR", "OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
 
 @OptionalExpectation
 expect annotation class Optional()
@@ -17,7 +15,6 @@ expect annotation class Optional()
 @Optional
 fun foo() = "42"
 
-@JsName("jsBar")
 fun bar() = "43"
 
 fun box(): String {

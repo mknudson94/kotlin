@@ -33601,6 +33601,12 @@ public class IrBlackBoxCodegenWithIrInlinerTestGenerated extends AbstractIrBlack
             }
 
             @Test
+            @TestMetadata("mpp_optional_expectation.kt")
+            public void testMpp_optional_expectation() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/mpp_optional_expectation.kt");
+            }
+
+            @Test
             @TestMetadata("remap_expect_property_ref.kt")
             public void testRemap_expect_property_ref() throws Exception {
                 runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/remap_expect_property_ref.kt");
