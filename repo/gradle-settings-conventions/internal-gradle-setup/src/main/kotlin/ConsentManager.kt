@@ -43,13 +43,15 @@ internal class ConsentManager(
         while (true) {
             output.println(PROMPT_REQUEST)
             when (input.readLine()) {
-                "yes" -> return true.also {
+                "yes" -> {
                     output.println("You've given the consent")
                     modifier.putLine(USER_CONSENT_MARKER)
+                    return true
                 }
-                "no" -> return false.also {
+                "no" -> {
                     output.println("You've refused to give the consent")
                     modifier.putLine(USER_REFUSAL_MARKER)
+                    return false
                 }
             }
         }
