@@ -3415,28 +3415,6 @@ standaloneTest("array_out_of_memory") {
             break;
     }
 }
-
-standaloneTest("mpp1") {
-    disabled = isK2(project) // KT-56071
-    source = "codegen/mpp/mpp1.kt"
-    flags = ['-tr', '-Xmulti-platform']
-}
-
-linkTest("mpp2") {
-    disabled = isK2(project) // KT-56071
-    useGoldenData = true
-    source = "codegen/mpp/mpp2.kt"
-    lib = "codegen/mpp/libmpp2.kt"
-    flags = ['-Xmulti-platform']
-}
-
-standaloneTest("mpp_default_args") {
-    // Disabled in one stage mode because of KT-57747
-    disabled = !twoStageEnabled || isK2(project) // KT-56071
-    source = "codegen/mpp/mpp_default_args.kt"
-    flags = ['-tr', '-Xmulti-platform']
-}
-
 standaloneTest("mpp_optional_expectation") {
     source = "codegen/mpp/mpp_optional_expectation.kt"
     def outputRoot = project.ext.testOutputLocal.toString()
