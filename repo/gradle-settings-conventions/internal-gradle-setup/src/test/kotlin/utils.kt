@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.build
 
-import kotlin.test.assertEquals
-
 internal fun assertContainsExactTimes(content: String, substring: String, expectedCount: Int) {
     var currentOffset = 0
     var count = 0
@@ -17,5 +15,11 @@ internal fun assertContainsExactTimes(content: String, substring: String, expect
         currentOffset = nextIndex + substring.length
         nextIndex = content.indexOf(substring, currentOffset)
     }
-    assertEquals(expectedCount, count)
+    assert(expectedCount == count) {
+        """
+            |The content is expected to contain '$substring' exactly $expectedCount times, but was found $count times:
+            |File content:
+            |${content.prependIndent()}
+        """.trimMargin()
+    }
 }
