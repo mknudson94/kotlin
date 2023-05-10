@@ -29,6 +29,7 @@ internal class ExecutionOnOsCondition : ExecutionCondition {
     private val disabledForCI = "Disabled for operating system: " + System.getProperty("os.name") + " on CI"
 
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult {
+        println("CURRENT OS IS: " + System.getProperty("os.name") + " and isCurrent=" + OS.MAC.isCurrentOs)
         val annotation = AnnotationUtils.findAnnotation(context.element, OsCondition::class.java)
         if (annotation.isPresent) {
             val supportedOn = annotation.get().supportedOn
