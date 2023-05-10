@@ -5621,14 +5621,6 @@ linkTest("private_fake_overrides_1") {
     useGoldenData = true
 }
 
-linkTest("remap_expect_property_refs") {
-    disabled = isK2(project) // KT-56071
-    source = "codegen/mpp/remap_expect_property_ref_main.kt"
-    lib = "codegen/mpp/remap_expect_property_ref_lib.kt"
-    flags = ["-Xmulti-platform"]
-    useGoldenData = true
-}
-
 Task frameworkTest(String name, Closure<FrameworkTest> configurator) {
     return KotlinNativeTestKt.createTest(project, name, FrameworkTest) { task ->
         configurator.delegate = task
