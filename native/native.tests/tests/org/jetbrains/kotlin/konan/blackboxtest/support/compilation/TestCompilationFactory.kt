@@ -108,7 +108,12 @@ internal class TestCompilationFactory {
     }
 
     fun testCasesToExecutable(testCases: Collection<TestCase>, settings: Settings): TestCompilation<Executable> {
-        val rootModules = testCases.flatMapToSet { testCase -> testCase.rootModules }
+        val rootModules = testCases.flatMapToSet { testCase ->
+            when (settings.get<TestMode>()) {
+                TestMode.ONE_STAGE_MULTI_MODULE -> testCase.modules // all modules must be compiled at once
+                TestMode.TWO_STAGE_MULTI_MODULE -> testCase.rootModules
+            }
+        }
         val cacheKey = ExecutableCacheKey(rootModules)
 
         // Fast pass.
