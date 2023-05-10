@@ -386,10 +386,10 @@ tasks.withType<Test> {
             includeEngines("junit-vintage")
         }
     }
-
+// TODO(Dmitrii Krasnov): логирование тестов
     testLogging {
         // set options for log level LIFECYCLE
-        events("passed", "skipped", "failed", "standardOut")
+        events("started", "passed", "skipped", "failed", "standardOut", "standardError")
         showExceptions = true
         exceptionFormat = TestExceptionFormat.FULL
         showCauses = true
@@ -415,7 +415,10 @@ tasks.withType<Test> {
                 }
             }
 
-            override fun beforeSuite(suite: TestDescriptor) {}
+            override fun beforeSuite(suite: TestDescriptor) {
+                println(suite.displayName + ": current os is: " + System.getProperty("os.name"))
+            }
+
             override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
             override fun beforeTest(testDescriptor: TestDescriptor) {}
         })
