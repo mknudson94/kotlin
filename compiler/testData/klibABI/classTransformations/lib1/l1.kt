@@ -141,3 +141,6 @@ class ClassToAbstractClass {
     var name: String = "Alice"
     fun getGreeting() = "Hello, $name!"
 }
+
+class RemovedClass
+enum class EnumClassWithDisappearingEntry { UNCHANGED, REMOVED }
