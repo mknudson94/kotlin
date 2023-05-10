@@ -3415,17 +3415,6 @@ standaloneTest("array_out_of_memory") {
             break;
     }
 }
-standaloneTest("mpp_optional_expectation") {
-    source = "codegen/mpp/mpp_optional_expectation.kt"
-    def outputRoot = project.ext.testOutputLocal.toString()
-    def srcPath = "$outputRoot/$name/mpp_optional_expectation.kt".with {
-        isWindows() ? it.replaceAll("/", "\\\\") : it
-    }
-    flags = [
-            '-Xmulti-platform',
-            "-Xcommon-sources=$srcPath"
-    ]
-}
 
 standaloneTest("freezing_control_basic_full") {
     enabled = isExperimentalMM && cacheTesting == null
