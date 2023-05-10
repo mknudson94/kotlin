@@ -456,6 +456,9 @@ targetList.each { target ->
 
     task("${target}CrossDist") {
         dependsOn "${target}CrossDistRuntime", "distCompiler"
+        if (target in cacheableTargetNames) {
+            dependsOn "${target}StdlibCache"
+        }
     }
 }
 
