@@ -10,11 +10,13 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
+import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirResolvable
 import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.resolve.calls.Candidate
 import org.jetbrains.kotlin.fir.resolve.calls.ImplicitExtensionReceiverValue
 import org.jetbrains.kotlin.fir.resolve.calls.ResolutionContext
+import org.jetbrains.kotlin.fir.resolve.calls.candidate
 import org.jetbrains.kotlin.fir.resolve.substitution.ChainedSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.resolve.substitution.replaceStubsAndTypeVariablesToErrors
@@ -121,7 +123,8 @@ class FirBuilderInferenceSession(
     override fun inferPostponedVariables(
         lambda: ResolvedLambdaAtom,
         constraintSystemBuilder: ConstraintSystemBuilder,
-        completionMode: ConstraintSystemCompletionMode
+        completionMode: ConstraintSystemCompletionMode,
+        returnArguments: Collection<FirExpression>
     ): Map<ConeTypeVariableTypeConstructor, ConeKotlinType>? {
         val (commonSystem, effectivelyEmptyConstraintSystem) = buildCommonSystem(constraintSystemBuilder.currentStorage())
         val resultingSubstitutor by lazy { getResultingSubstitutor(commonSystem) }
@@ -144,6 +147,14 @@ class FirBuilderInferenceSession(
 
         if (completionMode == ConstraintSystemCompletionMode.FULL) {
             constraintSystemBuilder.substituteFixedVariables(resultingSubstitutor)
+        }
+
+        returnArguments.forEach {
+            // TODO: Is it exhaustive set of variants?
+            if (it is FirResolvable) {
+                val candidate = it.candidate()
+                candidate?.system?.substituteFixedVariables(resultingSubstitutor)
+            }
         }
 
         updateCalls(resultingSubstitutor)
@@ -222,6 +233,7 @@ class FirBuilderInferenceSession(
         }
 
         if (shouldIntegrateAllConstraints) {
+            // TODO: Effectively dead-code
             for ((variableConstructor, type) in storage.fixedTypeVariables) {
                 val typeVariable = storage.allTypeVariables.getValue(variableConstructor)
                 commonSystem.registerTypeVariableIfNotPresent(typeVariable)
