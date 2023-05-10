@@ -62,9 +62,11 @@ fun box(): String {
         """@kotlin.Deprecated(level=WARNING, message=foo, replaceWith=@kotlin.ReplaceWith(expression=, imports=[]))""",
         C().three().toString()
     )
-    assertEquals(
-        """@a.OtherArrays(annotationsArray=[], doublesArray=[], enumArray=[], namesArray=[@kotlin.jvm.JvmName(name=foo)])""",
-        C().four().toString()
+    val otherArraysStr = C().four().toString()
+    // K1 and K2 have different properties order after metadata deserialization
+    assertTrue(
+        otherArraysStr == """@a.OtherArrays(doublesArray=[], enumArray=[], annotationsArray=[], namesArray=[@kotlin.jvm.JvmName(name=foo)])""" ||
+        otherArraysStr == """@a.OtherArrays(annotationsArray=[], doublesArray=[], enumArray=[], namesArray=[@kotlin.jvm.JvmName(name=foo)])"""
     )
     assertEquals(Int.MAX_VALUE.toUInt() + 10.toUInt(), C().five().uint)
     assertEquals("""@a.Outer(array=[@a.Outer.Inner(v=1), @a.Outer.Inner(v=2)])""", C().six().toString())
