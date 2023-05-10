@@ -134,6 +134,12 @@ public class FirOldFrontendMPPDiagnosticsWithPsiTestGenerated extends AbstractFi
     }
 
     @Test
+    @TestMetadata("unsupportedFeatureForExpectActualIfMppIsDisabled.kt")
+    public void testUnsupportedFeatureForExpectActualIfMppIsDisabled() throws Exception {
+        runTest("compiler/testData/diagnostics/tests/multiplatform/unsupportedFeatureForExpectActualIfMppIsDisabled.kt");
+    }
+
+    @Test
     @TestMetadata("varSetterVisibility.kt")
     public void testVarSetterVisibility() throws Exception {
         runTest("compiler/testData/diagnostics/tests/multiplatform/varSetterVisibility.kt");
