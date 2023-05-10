@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.scripting.definitions.annotationsForSamWithReceivers
 import org.jetbrains.kotlin.scripting.resolve.KtFileScriptSource
 import org.jetbrains.kotlin.scripting.resolve.VirtualFileScriptSource
@@ -61,6 +62,9 @@ class FirScriptConfiguratorExtensionImpl(
                 val stripped = if (endsWithStar) trimmed.substring(0, trimmed.length - 2) else trimmed
                 val fqName = FqName.fromSegments(stripped.split("."))
                 fileBuilder.imports += buildImport {
+                    val ktFile = (fileBuilder.sourceFile?.toSourceCode() as? KtFileScriptSource)?.ktFile!!
+                    val fakePsi = KtPsiFactory(ktFile.project, markGenerated = true).createClassKeyword()
+                    source = KtFakeSourceElement(fakePsi, KtFakeSourceElementKind.ImplicitImport)
                     importedFqName = fqName
                     isAllUnder = endsWithStar
                 }
