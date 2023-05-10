@@ -2,9 +2,12 @@
 // TARGET_BACKEND: JS_IR
 // TARGET_BACKEND: NATIVE
 // TARGET_BACKEND: WASM
+// TARGET_BACKEND: JVM_IR
 
 // Expected class 'A' has no actual declaration in module <common> for JS
 // IGNORE_BACKEND_K1: JS_IR
+// NO_ACTUAL_FOR_EXPECT: Expected class 'A' has no actual declaration in module <common> for JVM (13,14) in /common.kt
+// IGNORE_BACKEND_K1: JVM_IR
 
 // MODULE: common
 // FILE: common.kt

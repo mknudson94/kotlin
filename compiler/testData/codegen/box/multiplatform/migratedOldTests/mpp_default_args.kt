@@ -2,6 +2,7 @@
 // TARGET_BACKEND: JS_IR
 // TARGET_BACKEND: NATIVE
 // TARGET_BACKEND: WASM
+// TARGET_BACKEND: JVM_IR
 
 // Expected function 'inlineFunction' has no actual declaration in module <common> for JS
 // IGNORE_BACKEND_K1: JS_IR
@@ -9,6 +10,8 @@
 // IGNORE_BACKEND_K2: JS_IR
 // Wrong box result 'arg1 wrongly != this@Test5: arg1=Inner@1342209928, this@Test5=Test5@167512675'; Expected "OK"
 // IGNORE_BACKEND_K1: WASM
+// NO_ACTUAL_FOR_EXPECT: Expected class 'Test4' has no actual declaration in module <common> for JVM (24,14) in /common.kt
+// IGNORE_BACKEND_K1: JVM_IR
 
 // MODULE: common
 // FILE: common.kt

@@ -33581,6 +33581,30 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             public void testAllFilesPresentInMigratedOldTests() throws Exception {
                 KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/migratedOldTests"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);
             }
+
+            @Test
+            @TestMetadata("mpp1.kt")
+            public void testMpp1() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/mpp1.kt");
+            }
+
+            @Test
+            @TestMetadata("mpp2.kt")
+            public void testMpp2() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/mpp2.kt");
+            }
+
+            @Test
+            @TestMetadata("mpp_default_args.kt")
+            public void testMpp_default_args() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/mpp_default_args.kt");
+            }
+
+            @Test
+            @TestMetadata("remap_expect_property_ref.kt")
+            public void testRemap_expect_property_ref() throws Exception {
+                runTest("compiler/testData/codegen/box/multiplatform/migratedOldTests/remap_expect_property_ref.kt");
+            }
         }
 
         @Nested
