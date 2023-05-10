@@ -21006,6 +21006,39 @@ public class IrCodegenBoxWasmTestGenerated extends AbstractIrCodegenBoxWasmTest 
                     runTest("compiler/testData/codegen/box/multiplatform/k2/defaultArguments/withTypeParameter.kt");
                 }
             }
+
+            @TestMetadata("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class MigratedOldTests extends AbstractIrCodegenBoxWasmTest {
+                private void runTest(String testDataFilePath) throws Exception {
+                    KotlinTestUtils.runTest0(this::doTest, TargetBackend.WASM, testDataFilePath);
+                }
+
+                public void testAllFilesPresentInMigratedOldTests() throws Exception {
+                    KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests"), Pattern.compile("^([^_](.+))\\.kt$"), null, TargetBackend.WASM, true);
+                }
+
+                @TestMetadata("mpp1.kt")
+                public void testMpp1() throws Exception {
+                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp1.kt");
+                }
+
+                @TestMetadata("mpp2.kt")
+                public void testMpp2() throws Exception {
+                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp2.kt");
+                }
+
+                @TestMetadata("mpp_default_args.kt")
+                public void testMpp_default_args() throws Exception {
+                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp_default_args.kt");
+                }
+
+                @TestMetadata("remap_expect_property_ref.kt")
+                public void testRemap_expect_property_ref() throws Exception {
+                    runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/remap_expect_property_ref.kt");
+                }
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/multiplatform/multiModule")

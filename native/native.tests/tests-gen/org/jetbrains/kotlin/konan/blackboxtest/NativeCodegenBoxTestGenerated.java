@@ -26405,6 +26405,42 @@ public class NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTest 
                         runTest("compiler/testData/codegen/box/multiplatform/k2/defaultArguments/withTypeParameter.kt");
                     }
                 }
+
+                @Nested
+                @TestMetadata("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests")
+                @TestDataPath("$PROJECT_ROOT")
+                @UseExtTestCaseGroupProvider()
+                @DisabledTestsIfProperty(sourceLocations = { "compiler/testData/codegen/box/coroutines/featureIntersection/defaultExpect.kt", "compiler/testData/codegen/box/multiplatform/defaultArguments/*.kt", "compiler/testData/codegen/boxInline/multiplatform/defaultArguments/receiversAndParametersInLambda.kt" }, property = ClassLevelProperty.TEST_MODE, propertyValue = "ONE_STAGE_MULTI_MODULE")
+                public class MigratedOldTests {
+                    @Test
+                    public void testAllFilesPresentInMigratedOldTests() throws Exception {
+                        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.NATIVE, true);
+                    }
+
+                    @Test
+                    @TestMetadata("mpp1.kt")
+                    public void testMpp1() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp1.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("mpp2.kt")
+                    public void testMpp2() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp2.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("mpp_default_args.kt")
+                    public void testMpp_default_args() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/mpp_default_args.kt");
+                    }
+
+                    @Test
+                    @TestMetadata("remap_expect_property_ref.kt")
+                    public void testRemap_expect_property_ref() throws Exception {
+                        runTest("compiler/testData/codegen/box/multiplatform/k2/migratedOldTests/remap_expect_property_ref.kt");
+                    }
+                }
             }
 
             @Nested
