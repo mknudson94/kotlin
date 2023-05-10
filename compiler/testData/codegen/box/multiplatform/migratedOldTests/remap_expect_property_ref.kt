@@ -9,6 +9,8 @@
 // IGNORE_BACKEND_K1: JS_IR
 // NO_ACTUAL_FOR_EXPECT: Expected class 'Foo' has no actual declaration in module <common> for JVM (18,14) in /common.kt
 // IGNORE_BACKEND_K1: JVM_IR
+
+// Below are real problems
 // Can't link symbol function Foo.<get-p>
 // IGNORE_BACKEND_K1: WASM
 
